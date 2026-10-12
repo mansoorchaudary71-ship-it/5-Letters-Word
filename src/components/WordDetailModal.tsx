@@ -74,6 +74,7 @@ export const WordDetailModal: React.FC<WordDetailModalProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ word }),
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`); // no backend on GitHub Pages -> use fallback
       const data = await res.json();
       setAiInsights(data);
     } catch (err) {
