@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        try {
+          var origFetch = window.fetch;
+          var activeFetch = typeof origFetch === 'function' ? origFetch.bind(window) : origFetch;
+          Object.defineProperty(window, 'fetch', {
+            configurable: true,
+            enumerable: true,
+            get: function() {
+              return activeFetch;
+            },
+            set: function(val) {
+              activeFetch = val;
+            }
+          });
+        } catch (err) {
+          // Safe fallback
+        }
+      })();
+    </script>
+    <title>5-Letter Words - Word Finder, Solver &amp; Dictionary</title>
+    <meta name="description" content="The ultimate 5-letter words directory, Wordle solver, Scrabble helper, and vocabulary finder with definitions and letter filters." />
+    <meta property="og:title" content="5-Letter Words - Word Finder, Solver &amp; Dictionary" />
+    <meta property="og:description" content="The ultimate 5-letter words directory, Wordle solver, Scrabble helper, and vocabulary finder with definitions and letter filters." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="5-Letter Words" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="5-Letter Words - Word Finder, Solver &amp; Dictionary" />
+    <meta name="twitter:description" content="The ultimate 5-letter words directory, Wordle solver, Scrabble helper, and vocabulary finder with definitions and letter filters." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310B981'/%3E%3Ctext x='16' y='23' font-size='20' font-weight='bold' font-family='sans-serif' text-anchor='middle' fill='white'%3E5%3C/text%3E%3C/svg%3E" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "5-Letter Words Finder & Solver",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All",
+      "description": "Comprehensive 5-letter words directory, official Wordle solver, Scrabble point calculator, and dictionary with definition lookup.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-emerald-500 selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

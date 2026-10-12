@@ -1,0 +1,7 @@
+{
+  "name": "5-Letter Words - Word Finder, Solver & Dictionary",
+  "description": "The ultimate 5-letter words directory, Wordle solver, Scrabble helper, and vocabulary finder with definitions and letter filters.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
