@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { computeOverallFrequencies, computePositionalFrequencies } from '../data/letterStats';
-import { BarChart3, TrendingUp, Lightbulb } from 'lucide-react';
+import { BarChart3, TrendingUp, Lightbulb } from './ui/Icons';
 
 export const LetterStatsView: React.FC = () => {
   const overallFreqs = useMemo(() => computeOverallFrequencies(), []);

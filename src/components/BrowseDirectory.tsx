@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS } from '../data/words';
-import { BookOpen, ChevronRight, Hash, Sparkles } from 'lucide-react';
+import { BookOpen, ChevronRight, Hash, Sparkles } from './ui/Icons';
 
 interface BrowseDirectoryProps {
   onSelectWord: (word: WordEntry) => void;

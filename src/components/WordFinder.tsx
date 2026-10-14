@@ -7,7 +7,7 @@ import { WordTiles } from './ui/WordTiles';
 import {
   Search, SlidersHorizontal, ArrowUpDown, Copy, Check, Download,
   RefreshCw, X, Bookmark, ArrowUpRight
-} from 'lucide-react';
+} from './ui/Icons';
 
 interface WordFinderProps {
   onSelectWord: (word: WordEntry) => void;

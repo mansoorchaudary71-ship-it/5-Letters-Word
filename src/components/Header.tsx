@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { tabHref } from '../seo/links';
-import { Search, Sparkles, BookOpen, Shuffle, Bookmark, Gamepad2, BarChart3, HelpCircle, Type } from 'lucide-react';
+import { Search, Sparkles, BookOpen, Shuffle, Bookmark, Gamepad2, BarChart3, HelpCircle, Type } from './ui/Icons';
 
 export type ActiveTab = 'finder' | 'solver' | 'anagram' | 'browse' | 'game' | 'stats' | 'article' | 'word';
 

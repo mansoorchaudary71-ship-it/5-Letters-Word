@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { CardBlobs } from './ui/Blobs';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS } from '../data/words';
-import { Shuffle, HelpCircle, ChevronRight, Copy, Check } from 'lucide-react';
+import { Shuffle, HelpCircle, ChevronRight, Copy, Check } from './ui/Icons';
 import { copyText } from '../lib/clipboard';
 
 interface AnagramSolverProps {

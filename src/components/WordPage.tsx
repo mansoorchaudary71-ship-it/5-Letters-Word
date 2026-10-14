@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bookmark } from 'lucide-react';
+import { Bookmark } from './ui/Icons';
 import { ALL_WORDS } from '../data/words';
 import { WordEntry } from '../types/word';
 import { WordTiles } from './ui/WordTiles';

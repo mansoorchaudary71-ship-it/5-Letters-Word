@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS, WORDS_SET } from '../data/words';
-import { RotateCcw, Trophy, Sparkles, BookOpen, Share2, Check } from 'lucide-react';
+import { RotateCcw, Trophy, Sparkles, BookOpen, Share2, Check } from './ui/Icons';
 import { copyText } from '../lib/clipboard';
 
 interface WordleGameProps {

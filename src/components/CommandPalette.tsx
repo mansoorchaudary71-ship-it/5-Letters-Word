@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Search, Sparkles, BookOpen, Gamepad2, BarChart3, Type, CornerDownLeft, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, Sparkles, BookOpen, Gamepad2, BarChart3, Type, CornerDownLeft, ArrowUp, ArrowDown } from './ui/Icons';
 import { ALL_WORDS } from '../data/words';
 import { WordEntry } from '../types/word';
 import { useDialog } from '../hooks/useDialog';

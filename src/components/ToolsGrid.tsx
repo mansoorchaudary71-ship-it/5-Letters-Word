@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from './ui/Icons';
 import { tabHref } from '../seo/links';
 import { Tab } from '../seo/routes';
 import { WordTiles } from './ui/WordTiles';

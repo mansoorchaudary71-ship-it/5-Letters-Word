@@ -6,7 +6,7 @@ import { hasWordPage, wordPath } from '../seo/content';
 import { withBase } from '../seo/links';
 import { copyText } from '../lib/clipboard';
 import { useDialog } from '../hooks/useDialog';
-import { X, Volume2, Bookmark, Copy, Check, Sparkles, Lightbulb, HelpCircle, History, ArrowUpRight } from 'lucide-react';
+import { X, Volume2, Bookmark, Copy, Check, Sparkles, Lightbulb, HelpCircle, History, ArrowUpRight } from './ui/Icons';
 
 interface WordDetailModalProps {
   wordEntry: WordEntry | null;

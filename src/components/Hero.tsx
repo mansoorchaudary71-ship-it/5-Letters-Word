@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from './ui/Icons';
 import { ALL_WORDS } from '../data/words';
 import { WordEntry } from '../types/word';
 import { tabHref } from '../seo/links';
@@ -90,7 +90,7 @@ export const Hero: React.FC<HeroProps> = ({ heading, onNavigate, onSelectWord })
 
       {/* Organic corner blobs */}
       <Blob className="absolute -z-10 -top-16 -right-16 w-64 sm:w-96 text-indigo-100" />
-      <Blob className="absolute -z-10 top-40 -left-24 w-56 sm:w-80 text-amber-100/80" />
+      <Blob className="absolute -z-10 top-40 -left-24 w-56 sm:w-80 text-amber-100 opacity-80" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-10 sm:pb-14 text-center">
         <a

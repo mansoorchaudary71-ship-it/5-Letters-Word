@@ -4,7 +4,7 @@ import { ALL_WORDS } from '../data/words';
 import { copyText } from '../lib/clipboard';
 import { useDialog } from '../hooks/useDialog';
 import { WordTiles } from './ui/WordTiles';
-import { X, Bookmark, Trash2, Copy, Check, Download, BookOpen } from 'lucide-react';
+import { X, Bookmark, Trash2, Copy, Check, Download, BookOpen } from './ui/Icons';
 
 interface FavoritesDrawerProps {
   isOpen: boolean;

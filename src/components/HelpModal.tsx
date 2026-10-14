@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Sparkles, BookOpen, Trophy } from 'lucide-react';
+import { X, Sparkles, BookOpen, Trophy } from './ui/Icons';
 import { useDialog } from '../hooks/useDialog';
 
 interface HelpModalProps {
