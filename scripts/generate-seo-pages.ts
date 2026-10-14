@@ -23,6 +23,45 @@ const SITE_URL = (process.env.SITE_URL || '').replace(/\/$/, '');
 const BASE = (process.env.VITE_BASE_PATH || '/').replace(/\/$/, ''); // "" or "/repo"
 const DIST = path.resolve(process.cwd(), 'dist');
 
+// ---- Chunk preloading ------------------------------------------------------------------------------
+// Tool pages lazy-load their component. Without a hint the browser only discovers that chunk after the main
+// bundle has run (index.html -> main.js -> tool.js, one request after another). A modulepreload link in the
+// page head lets it download in parallel with the main bundle.
+const TOOL_CHUNKS: Record<string, string> = {
+  solver: 'src/components/WordleSolver.tsx',
+  anagram: 'src/components/AnagramSolver.tsx',
+  browse: 'src/components/BrowseDirectory.tsx',
+  game: 'src/components/WordleGame.tsx',
+  stats: 'src/components/LetterStatsView.tsx',
+};
+interface ManifestEntry {
+  file: string;
+  isEntry?: boolean;
+  imports?: string[];
+}
+function loadManifest(): Record<string, ManifestEntry> | null {
+  for (const p of [path.join(DIST, '.vite', 'manifest.json'), path.join(DIST, 'manifest.json')]) {
+    if (existsSync(p)) return JSON.parse(readFileSync(p, 'utf8'));
+  }
+  console.warn('WARNING: Vite manifest not found, tool pages will not get modulepreload hints.');
+  return null;
+}
+const MANIFEST = loadManifest();
+
+function preloadTags(route: RouteInfo): string {
+  const key = TOOL_CHUNKS[route.tab];
+  if (!MANIFEST || !key || !MANIFEST[key]) return '';
+  const files = new Set<string>();
+  const visit = (k: string) => {
+    const entry = MANIFEST[k];
+    if (!entry || entry.isEntry || files.has(entry.file)) return; // the main bundle is already loaded by <script>
+    files.add(entry.file);
+    (entry.imports ?? []).forEach(visit);
+  };
+  visit(key);
+  return [...files].map((f) => `\n    <link rel="modulepreload" crossorigin href="${BASE}/${f}">`).join('');
+}
+
 if (!SITE_URL) {
   console.warn('WARNING: SITE_URL is not set. Canonical URLs and sitemap.xml will use https://example.com. Set SITE_URL before deploying.');
 }
@@ -321,7 +360,7 @@ function render(template: string, route: RouteInfo, noindex = false): string {
   // Function replacers: page text must never be interpreted as a "$&" replacement pattern.
   return template
     .replace(/<title>[\s\S]*?<\/title>/, () => '')
-    .replace('</head>', () => `    ${headTags(route, noindex)}\n  </head>`)
+    .replace('</head>', () => `    ${headTags(route, noindex)}${preloadTags(route)}\n  </head>`)
     .replace('<div id="root"></div>', () => bodyHtml(route));
 }
 

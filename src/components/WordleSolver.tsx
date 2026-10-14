@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { CardBlobs } from './ui/Blobs';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS } from '../data/words';
-import { scoreWordForWordle } from '../data/letterStats';
+import { buildLetterFreqs, scoreWordWithFreqs } from '../data/letterStats';
 import { Sparkles, RotateCcw, AlertCircle, Copy, Check, ChevronRight } from './ui/Icons';
 import { copyText } from '../lib/clipboard';
 
@@ -111,9 +111,10 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
   const topRecommendations = useMemo(() => {
     if (matchingWords.length <= 1) return matchingWords;
 
+    const freqs = buildLetterFreqs(matchingWords);
     const scored = matchingWords.map((entry) => ({
       entry,
-      score: scoreWordForWordle(entry.word, matchingWords),
+      score: scoreWordWithFreqs(entry.word, freqs),
     }));
 
     return scored

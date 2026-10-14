@@ -8,6 +8,10 @@ export default defineConfig(() => {
     // Needed for GitHub Pages project sites (https://<user>.github.io/<repo>/). Defaults to '/' locally.
     base: process.env.VITE_BASE_PATH || '/',
     plugins: [react(), tailwindcss()],
+    build: {
+      // scripts/generate-seo-pages.ts reads this to add <link rel="modulepreload"> for each tool page
+      manifest: true,
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

@@ -13,7 +13,7 @@ interface WaveBackgroundProps {
 
 const W = 1440;
 const H = 320;
-const STEP = 30; // length of each line segment
+const STEP = 20; // x spacing of the sampled points
 
 interface Field {
   count: number; // number of wave lines
@@ -32,26 +32,26 @@ const FIELDS: Record<WaveBackgroundVariant, Field> = {
   dense: { count: 10, gap: 14, top: 70, amp: 30, ampGrow: 2, cycles: 1.6, phase: 1.2, shift: 0.28 },
 };
 
-type Seg = readonly [number, number, number, number];
-
-/** Each wave line is a chain of short <line> segments along a sine curve. */
-const buildWaves = (f: Field): Seg[][] =>
+/** Each wave is one polyline sampled along a sine curve (a single SVG element, not hundreds). */
+const buildWaves = (f: Field): string[] =>
   Array.from({ length: f.count }, (_, k) => {
     const amp = f.amp + k * f.ampGrow;
-    const yAt = (x: number) => f.top + k * f.gap + amp * Math.sin((x / W) * f.cycles * Math.PI * 2 + f.phase + k * f.shift);
-    const segs: Seg[] = [];
-    for (let x = 0; x < W; x += STEP) segs.push([x, yAt(x), x + STEP, yAt(x + STEP)]);
-    return segs;
+    const pts: string[] = [];
+    for (let x = 0; x <= W; x += STEP) {
+      const y = f.top + k * f.gap + amp * Math.sin((x / W) * f.cycles * Math.PI * 2 + f.phase + k * f.shift);
+      pts.push(`${x},${y.toFixed(1)}`);
+    }
+    return pts.join(' ');
   });
 
-const WAVES: Record<WaveBackgroundVariant, Seg[][]> = {
+const WAVES: Record<WaveBackgroundVariant, string[]> = {
   flow: buildWaves(FIELDS.flow),
   calm: buildWaves(FIELDS.calm),
   dense: buildWaves(FIELDS.dense),
 };
 
 /**
- * Abstract flowing-wave background drawn only with <line> elements (no <path>).
+ * Abstract flowing-wave background drawn with stroked polylines (no <path>, no fills).
  * Decorative: hidden from assistive tech and never interactive. Stretches to fill its box,
  * and non-scaling strokes keep the lines hairline-thin at any size.
  *
@@ -72,12 +72,14 @@ export const WaveBackground: React.FC<WaveBackgroundProps> = ({ className = '', 
       strokeWidth="1.5"
       strokeLinecap="round"
     >
-      {waves.map((segs, k) => (
-        <g key={k} opacity={0.2 + 0.8 * (1 - k / waves.length)}>
-          {segs.map((s, i) => (
-            <line key={i} x1={s[0]} y1={s[1]} x2={s[2]} y2={s[3]} vectorEffect="non-scaling-stroke" />
-          ))}
-        </g>
+      {waves.map((points, k) => (
+        <polyline
+          key={k}
+          points={points}
+          strokeLinejoin="round"
+          opacity={0.2 + 0.8 * (1 - k / waves.length)}
+          vectorEffect="non-scaling-stroke"
+        />
       ))}
     </svg>
   );

@@ -63,30 +63,40 @@ export function computePositionalFrequencies(): Record<number, LetterFrequency[]
   return result;
 }
 
-// Wordle Solver entropy / letter variety scorer
-export function scoreWordForWordle(word: string, currentCandidates: WordEntry[]): number {
-  if (currentCandidates.length === 0) return 0;
-  
-  // Count frequency of unique letters among current candidates
-  const charFreqs: Record<string, number> = {};
-  currentCandidates.forEach((c) => {
-    const uniqueLetters = new Set(c.word.split(''));
-    uniqueLetters.forEach((ch) => {
-      charFreqs[ch] = (charFreqs[ch] || 0) + 1;
-    });
-  });
+// Wordle Solver entropy / letter variety scorer.
+// Build the letter table ONCE per candidate list, then score every guess against it. (Rebuilding the
+// table for each guess made the solver O(n^2): about a million Set allocations on first render.)
+export function buildLetterFreqs(candidates: WordEntry[]): Record<string, number> {
+  const freqs: Record<string, number> = {};
+  for (const c of candidates) {
+    const w = c.word;
+    let seen = 0; // bitmask of letters already counted for this word
+    for (let i = 0; i < w.length; i++) {
+      const bit = 1 << (w.charCodeAt(i) - 65);
+      if (!(seen & bit)) {
+        seen |= bit;
+        freqs[w[i]] = (freqs[w[i]] || 0) + 1;
+      }
+    }
+  }
+  return freqs;
+}
 
-  // Calculate score prioritizing diverse high-frequency letters
-  const wordChars = new Set(word.split(''));
+export function scoreWordWithFreqs(word: string, freqs: Record<string, number>): number {
+  const wordChars = new Set(word);
   let score = 0;
   wordChars.forEach((ch) => {
-    score += charFreqs[ch] || 0;
+    score += freqs[ch] || 0;
   });
 
   // Deduct penalty for duplicate letters in guess when looking for information
   if (wordChars.size < 5) {
     score -= (5 - wordChars.size) * 15;
   }
-
   return score;
+}
+
+export function scoreWordForWordle(word: string, currentCandidates: WordEntry[]): number {
+  if (currentCandidates.length === 0) return 0;
+  return scoreWordWithFreqs(word, buildLetterFreqs(currentCandidates));
 }

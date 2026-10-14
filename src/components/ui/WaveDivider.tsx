@@ -12,8 +12,8 @@ interface WaveDividerProps {
 
 const W = 1440;
 const H = 120;
-const FILL_STEP = 8; // width of each vertical fill line
-const CREST_STEP = 20; // length of each crest line segment
+const FILL_STEP = 8; // x spacing of the filled outline
+const CREST_STEP = 20; // x spacing of the crest line
 
 interface Wave {
   base: number;
@@ -33,13 +33,27 @@ const WAVES: Record<WaveVariant, Wave[]> = {
 
 const yAt = (w: Wave, x: number) => w.base + w.amp * Math.sin((x / W) * w.cycles * Math.PI * 2 + w.phase);
 
+const trace = (w: Wave, step: number) => {
+  const pts: string[] = [];
+  for (let x = 0; x <= W; x += step) pts.push(`${x},${yAt(w, x).toFixed(1)}`);
+  return pts.join(' ');
+};
+
+/** Built once at load: each wave is a filled outline (polygon) plus a crest line (polyline). */
+const SHAPES: Record<WaveVariant, { fill: string; crest: string }[]> = Object.fromEntries(
+  (Object.keys(WAVES) as WaveVariant[]).map((v) => [
+    v,
+    WAVES[v].map((w) => ({ fill: `${trace(w, FILL_STEP)} ${W},${H + 1} 0,${H + 1}`, crest: trace(w, CREST_STEP) })),
+  ]),
+) as Record<WaveVariant, { fill: string; crest: string }[]>;
+
 /**
- * Full-bleed curved divider drawn only with <line> elements:
- * a row of vertical lines forms the filled area and a chain of short lines traces the crest.
+ * Full-bleed curved divider drawn with line-style shapes (no <path>): one polygon fills the area
+ * below the wave and one polyline traces the crest, so each divider is 2-4 SVG elements.
  * Inline SVG, scales to any width, hidden from assistive tech.
  */
 export const WaveDivider: React.FC<WaveDividerProps> = ({ className = 'text-slate-50', variant = 'swoosh', flip = false }) => {
-  const waves = WAVES[variant];
+  const shapes = SHAPES[variant];
   return (
     <svg
       aria-hidden="true"
@@ -48,27 +62,21 @@ export const WaveDivider: React.FC<WaveDividerProps> = ({ className = 'text-slat
       preserveAspectRatio="none"
       className={`block w-full h-10 sm:h-14 lg:h-20 ${flip ? 'rotate-180' : ''} ${className}`}
     >
-      {waves.map((w, wi) => {
-        const isFront = wi === waves.length - 1;
-        const fills: React.ReactNode[] = [];
-        for (let x = FILL_STEP / 2; x < W + FILL_STEP; x += FILL_STEP) {
-          fills.push(<line key={x} x1={x} y1={yAt(w, x)} x2={x} y2={H + 1} />);
-        }
-        const crest: React.ReactNode[] = [];
-        if (isFront) {
-          for (let x = 0; x < W; x += CREST_STEP) {
-            crest.push(<line key={x} x1={x} y1={yAt(w, x)} x2={x + CREST_STEP} y2={yAt(w, x + CREST_STEP)} />);
-          }
-        }
+      {shapes.map((shape, wi) => {
+        const isFront = wi === shapes.length - 1;
         return (
           <g key={wi}>
-            <g stroke="currentColor" strokeWidth={FILL_STEP + 0.8} strokeLinecap="butt" opacity={isFront ? 1 : 0.5}>
-              {fills}
-            </g>
+            <polygon points={shape.fill} fill="currentColor" opacity={isFront ? 1 : 0.5} />
             {isFront && (
-              <g className="stroke-indigo-200" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke">
-                {crest}
-              </g>
+              <polyline
+                points={shape.crest}
+                fill="none"
+                className="stroke-indigo-200"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
             )}
           </g>
         );

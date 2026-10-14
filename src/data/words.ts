@@ -1018,7 +1018,8 @@ export function buildWordDictionary(): WordEntry[] {
   }
 
   // Sort alphabetically initially
-  return wordList.sort((a, b) => a.word.localeCompare(b.word));
+  // Plain comparison: every entry is A-Z only, so this matches localeCompare without the slow ICU lookups.
+  return wordList.sort((a, b) => (a.word < b.word ? -1 : a.word > b.word ? 1 : 0));
 }
 
 export const ALL_WORDS: WordEntry[] = buildWordDictionary();

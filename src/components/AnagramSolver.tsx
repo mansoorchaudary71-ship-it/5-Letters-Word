@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { CardBlobs } from './ui/Blobs';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS } from '../data/words';
@@ -9,10 +9,32 @@ interface AnagramSolverProps {
   onSelectWord: (word: WordEntry) => void;
 }
 
+const PAGE_SIZE = 96;
+
+interface IndexedWord {
+  entry: WordEntry;
+  counts: number[]; // letter counts A-Z
+  key: string; // letters sorted, for exact-anagram checks
+}
+
+// Letter counts are computed once for the whole dictionary instead of on every keystroke.
+let WORD_INDEX: IndexedWord[] | null = null;
+const getIndex = (): IndexedWord[] => {
+  if (!WORD_INDEX) {
+    WORD_INDEX = ALL_WORDS.map((entry) => {
+      const counts = new Array<number>(26).fill(0);
+      for (let i = 0; i < entry.word.length; i++) counts[entry.word.charCodeAt(i) - 65]++;
+      return { entry, counts, key: entry.word.split('').sort().join('') };
+    });
+  }
+  return WORD_INDEX;
+};
+
 export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) => {
   const [lettersInput, setLettersInput] = useState<string>('EARTH');
   const [allowSubAnagrams, setAllowSubAnagrams] = useState<boolean>(false);
   const [copiedWord, setCopiedWord] = useState<string | null>(null);
+  const [limit, setLimit] = useState(PAGE_SIZE);
 
   // Quick preset letter racks
   const presets = ['EARTH', 'CRANE', 'STARE', 'PLANT', 'LIGHT', 'AUDIO', 'STONE', 'DREAM'];
@@ -24,38 +46,31 @@ export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) =>
     const wildcardsCount = (raw.match(/[\?\*]/g) || []).length;
     const cleanLetters = raw.replace(/[\?\*]/g, '');
 
-    // Letter frequency map of input
-    const inputCounts: Record<string, number> = {};
-    for (const char of cleanLetters) {
-      inputCounts[char] = (inputCounts[char] || 0) + 1;
-    }
+    const inputCounts = new Array<number>(26).fill(0);
+    for (let i = 0; i < cleanLetters.length; i++) inputCounts[cleanLetters.charCodeAt(i) - 65]++;
 
-    return ALL_WORDS.filter((entry) => {
-      const w = entry.word;
-      const wordCounts: Record<string, number> = {};
-      for (const char of w) {
-        wordCounts[char] = (wordCounts[char] || 0) + 1;
+    // Strict exact anagram (no wildcards, no partial matches): compare sorted letters
+    const exactKey = !allowSubAnagrams && wildcardsCount === 0 && cleanLetters.length === 5 ? cleanLetters.split('').sort().join('') : null;
+
+    const found: WordEntry[] = [];
+    for (const { entry, counts, key } of getIndex()) {
+      if (exactKey !== null) {
+        if (key === exactKey) found.push(entry);
+        continue;
       }
-
       let neededWildcards = 0;
-      for (const [char, count] of Object.entries(wordCounts)) {
-        const available = inputCounts[char] || 0;
-        if (available < count) {
-          neededWildcards += count - available;
-        }
+      for (let i = 0; i < 26; i++) {
+        const missing = counts[i] - inputCounts[i];
+        if (missing > 0) neededWildcards += missing;
       }
+      if (neededWildcards <= wildcardsCount) found.push(entry);
+    }
+    return found.sort((a, b) => b.scrabbleScore - a.scrabbleScore);
+  }, [lettersInput, allowSubAnagrams]);
 
-      if (neededWildcards > wildcardsCount) {
-        return false;
-      }
-
-      // If strict exact anagram (and no wildcards)
-      if (!allowSubAnagrams && wildcardsCount === 0 && cleanLetters.length === 5) {
-        return cleanLetters.split('').sort().join('') === w.split('').sort().join('');
-      }
-
-      return true;
-    }).sort((a, b) => b.scrabbleScore - a.scrabbleScore);
+  // A new search starts back at the first page
+  useEffect(() => {
+    setLimit(PAGE_SIZE);
   }, [lettersInput, allowSubAnagrams]);
 
   const handleCopyWord = (word: string) => {
@@ -148,7 +163,7 @@ export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) =>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {results.map((wordEntry) => (
+          {results.slice(0, limit).map((wordEntry) => (
             <div
               key={wordEntry.word}
               onClick={() => onSelectWord(wordEntry)}
@@ -190,6 +205,18 @@ export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) =>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {results.length > limit && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setLimit((l) => l + PAGE_SIZE)}
+            className="px-5 py-2.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+          >
+            Show more ({(results.length - limit).toLocaleString()} left)
+          </button>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { Suspense, lazy, startTransition, useEffect, useState } from 'react';
 import { Header, ActiveTab } from './components/Header';
 import { WordFinder } from './components/WordFinder';
 import { WordDetailModal } from './components/WordDetailModal';
@@ -19,11 +19,26 @@ import { Filter, HOME_ROUTE, RouteInfo, filterPath, resolveRoute, tabPath } from
 import { applyRouteHead, withBase } from './seo/links';
 
 // Secondary tools are split into their own chunks so the home page (the word finder) loads less JavaScript.
-const WordleSolver = lazy(() => import('./components/WordleSolver').then((m) => ({ default: m.WordleSolver })));
-const AnagramSolver = lazy(() => import('./components/AnagramSolver').then((m) => ({ default: m.AnagramSolver })));
-const BrowseDirectory = lazy(() => import('./components/BrowseDirectory').then((m) => ({ default: m.BrowseDirectory })));
-const WordleGame = lazy(() => import('./components/WordleGame').then((m) => ({ default: m.WordleGame })));
-const LetterStatsView = lazy(() => import('./components/LetterStatsView').then((m) => ({ default: m.LetterStatsView })));
+const loadSolver = () => import('./components/WordleSolver').then((m) => ({ default: m.WordleSolver }));
+const loadAnagram = () => import('./components/AnagramSolver').then((m) => ({ default: m.AnagramSolver }));
+const loadBrowse = () => import('./components/BrowseDirectory').then((m) => ({ default: m.BrowseDirectory }));
+const loadGame = () => import('./components/WordleGame').then((m) => ({ default: m.WordleGame }));
+const loadStats = () => import('./components/LetterStatsView').then((m) => ({ default: m.LetterStatsView }));
+
+const WordleSolver = lazy(loadSolver);
+const AnagramSolver = lazy(loadAnagram);
+const BrowseDirectory = lazy(loadBrowse);
+const WordleGame = lazy(loadGame);
+const LetterStatsView = lazy(loadStats);
+
+/** Fetch every tool chunk in the background so switching tools never waits on the network. */
+const preloadTools = () => {
+  void loadSolver();
+  void loadAnagram();
+  void loadBrowse();
+  void loadGame();
+  void loadStats();
+};
 
 const BASE = import.meta.env.BASE_URL || '/';
 const routeFromLocation = (): RouteInfo => resolveRoute(window.location.pathname, BASE) ?? HOME_ROUTE;
@@ -45,11 +60,23 @@ export default function App() {
   useEffect(() => {
     const onPop = () => {
       const r = routeFromLocation();
-      setRoute(r);
-      setFinderFilter(r.filter);
+      startTransition(() => {
+        setRoute(r);
+        setFinderFilter(r.filter);
+      });
     };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Once the first page is up, warm the other tools while the browser is idle
+  useEffect(() => {
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(preloadTools, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(preloadTools, 1200);
+    return () => window.clearTimeout(t);
   }, []);
 
   // Global shortcuts: Ctrl/Cmd+K or "/" opens search
@@ -77,9 +104,12 @@ export default function App() {
   const goToPath = (path: string, filter?: Filter) => {
     const next = resolveRoute(path, '/') ?? HOME_ROUTE;
     window.history.pushState({}, '', withBase(next.path));
-    setRoute(next);
-    setFinderFilter(filter ?? next.filter);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // A transition keeps the current page on screen until the next tool is ready (no spinner flash)
+    startTransition(() => {
+      setRoute(next);
+      setFinderFilter(filter ?? next.filter);
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const setActiveTab = (tab: ActiveTab) => goToPath(tabPath(tab));

@@ -1,8 +1,9 @@
 import React from 'react';
 
 /**
- * Line-only icon set. Every glyph is drawn with line elements, so the site ships no
- * SVG path elements. Same names as the lucide-react icons they replace, and the same
+ * Line-only icon set. Every glyph is drawn with line / polyline elements, so the site ships no
+ * SVG path elements. Connected segments are merged into a single <polyline> (a Search icon is
+ * 2 elements instead of 15), which keeps pages with many icons (word grids) light on the DOM. Same names as the lucide-react icons they replace, and the same
  * className API (size with width/height classes, colour with text colour classes).
  */
 type Seg = [number, number, number, number];
@@ -24,7 +25,22 @@ const arc = (cx: number, cy: number, r: number, from: number, to: number, steps 
     }),
   );
 
+const fmt = (n: number) => String(Math.round(n * 100) / 100);
+
+/** Join consecutive segments that share an endpoint into one polyline "points" string. */
+const toChains = (segs: Seg[]): string[] => {
+  const chains: Pt[][] = [];
+  for (const [x1, y1, x2, y2] of segs) {
+    const last = chains[chains.length - 1];
+    const end = last && last[last.length - 1];
+    if (end && end[0] === x1 && end[1] === y1) last.push([x2, y2]);
+    else chains.push([[x1, y1], [x2, y2]]);
+  }
+  return chains.map((c) => c.map((p) => `${fmt(p[0])},${fmt(p[1])}`).join(' '));
+};
+
 const make = (segs: Seg[], dots: Dot[] = [], displayName = 'Icon'): React.FC<IconProps> => {
+  const chains = toChains(segs);
   const Icon: React.FC<IconProps> = ({ className }) => (
     <svg
       aria-hidden="true"
@@ -40,8 +56,8 @@ const make = (segs: Seg[], dots: Dot[] = [], displayName = 'Icon'): React.FC<Ico
       strokeLinejoin="round"
       className={className}
     >
-      {segs.map((s, i) => (
-        <line key={i} x1={s[0]} y1={s[1]} x2={s[2]} y2={s[3]} />
+      {chains.map((points, i) => (
+        <polyline key={i} points={points} />
       ))}
       {dots.map((d, i) => (
         <line key={`d${i}`} x1={d[0]} y1={d[1]} x2={d[0] + 0.01} y2={d[1]} strokeWidth="3.2" />
