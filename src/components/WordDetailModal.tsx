@@ -127,7 +127,7 @@ export const WordDetailModal: React.FC<WordDetailModalProps> = ({
               aria-label={isFav ? 'Remove from saved words' : 'Save word'}
               className={iconBtn}
             >
-              <Bookmark className={`w-[18px] h-[18px] ${isFav ? 'fill-ink text-ink' : ''}`} />
+              <Bookmark className={`w-[18px] h-[18px] ${isFav ? 'fill-brand text-brand' : ''}`} />
             </button>
             <button type="button" onClick={onClose} aria-label="Close" className={iconBtn}>
               <X className="w-[18px] h-[18px]" />
@@ -207,7 +207,7 @@ export const WordDetailModal: React.FC<WordDetailModalProps> = ({
                     key={an.word}
                     type="button"
                     onClick={() => onSelectWord(an)}
-                    className="h-8 px-3.5 rounded-full border border-slate-200 bg-white text-xs font-semibold tracking-wide text-ink hover:bg-ink hover:text-white hover:border-ink transition-colors"
+                    className="h-8 px-3.5 rounded-full border border-slate-200 bg-white text-xs font-semibold tracking-wide text-ink hover:bg-brand hover:text-white hover:border-brand transition-colors"
                   >
                     {an.word}
                   </button>

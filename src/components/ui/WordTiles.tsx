@@ -3,9 +3,9 @@ import React from 'react';
 export type TileState = 'ink' | 'soft' | 'hit' | 'near' | 'miss';
 
 const STATE_CLASS: Record<TileState, string> = {
-  ink: 'bg-ink text-white',
+  ink: 'bg-brand text-white',
   soft: 'bg-slate-100 text-ink',
-  hit: 'bg-hit text-white',
+  hit: 'bg-hit text-ink',
   near: 'bg-near text-ink',
   miss: 'bg-miss text-white',
 };

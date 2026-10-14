@@ -67,7 +67,7 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
         {/* Header */}
         <div className="px-5 h-16 shrink-0 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Bookmark className="w-[18px] h-[18px] fill-ink" />
+            <Bookmark className="w-[18px] h-[18px] fill-brand" />
             <h2 id="saved-title" className="font-semibold tracking-tight text-ink">
               Saved words <span className="text-slate-400 font-normal tabular-nums">({favorites.length})</span>
             </h2>
@@ -117,7 +117,7 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
                 <button
                   type="button"
                   onClick={() => setRevealMeaning(true)}
-                  className="w-full h-10 rounded-full bg-ink text-white text-[13px] font-medium hover:bg-slate-800 transition-colors"
+                  className="w-full h-10 rounded-full bg-brand text-white text-[13px] font-medium hover:bg-brand-hover transition-colors"
                 >
                   Reveal definition
                 </button>
@@ -204,7 +204,7 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
                   setFlashcardIndex(0);
                   setRevealMeaning(false);
                 }}
-                className="inline-flex items-center justify-center gap-1.5 h-10 rounded-full bg-ink text-white text-[13px] font-medium hover:bg-slate-800 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 h-10 rounded-full bg-brand text-white text-[13px] font-medium hover:bg-brand-hover transition-colors"
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 Study

@@ -4,6 +4,7 @@ import { ALL_WORDS } from '../data/words';
 import { WordEntry } from '../types/word';
 import { tabHref } from '../seo/links';
 import { TileState, WordTiles } from './ui/WordTiles';
+import { WaveDivider } from './ui/WaveDivider';
 
 interface HeroProps {
   heading: string;
@@ -79,12 +80,20 @@ export const Hero: React.FC<HeroProps> = ({ heading, onNavigate, onSelectWord })
   }, []);
 
   return (
-    <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden border-b border-slate-200/70">
+    <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden bg-white">
       {/* Backdrop: dotted grid that fades out toward the bottom */}
       <div
         aria-hidden="true"
         className="absolute inset-0 -z-10 bg-dots [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,#000_20%,transparent_75%)]"
       />
+
+      {/* Organic corner blobs */}
+      <svg aria-hidden="true" viewBox="0 0 200 200" className="absolute -z-10 -top-16 -right-16 w-64 sm:w-96 text-indigo-100" fill="currentColor">
+        <path d="M44.7-52.6C57.3-41.7 66.2-26.6 69.6-10c3.4 16.6 1.3 34.7-8.1 47.6C52.1 50.5 36.2 58.2 19 63.3c-17.2 5.1-35.7 7.6-49.3.8C-43.9 57.4-52.6 41.9-58.9 25.5c-6.3-16.4-10.2-33.7-3.9-47.4C-56.5-35.6-39.3-45.7-23.1-54.9c16.2-9.2 32.5-17.5 46.1-14.3 8.6 2 14.4 8.8 21.7 16.6Z" transform="translate(100 100)" />
+      </svg>
+      <svg aria-hidden="true" viewBox="0 0 200 200" className="absolute -z-10 top-40 -left-24 w-56 sm:w-80 text-amber-100/80" fill="currentColor">
+        <path d="M39.9-47.8C51.7-36.3 61.2-23.6 64.9-9 68.6 5.6 66.5 22.1 57.4 33.7 48.3 45.3 32.2 52 15.5 58.2-1.2 64.4-18.5 70.1-32.3 64.6-46.1 59.1-56.3 42.3-62 24.5c-5.7-17.8-6.9-36.6.3-50.4C-54.5-39.7-39.5-48.6-24.3-58.5-9.1-68.4 6.4-79.4 18.4-74.6 30.4-69.8 28.1-59.3 39.9-47.8Z" transform="translate(100 100)" />
+      </svg>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-10 sm:pb-14 text-center">
         <a
@@ -92,7 +101,7 @@ export const Hero: React.FC<HeroProps> = ({ heading, onNavigate, onSelectWord })
           onClick={(e) => handleNav(e, () => onNavigate('/wordle-solver/'))}
           className="inline-flex items-center gap-2 h-8 pl-2 pr-3 rounded-full border border-slate-200 bg-white/80 backdrop-blur text-xs font-medium text-slate-600 hover:border-slate-300 hover:text-ink transition-colors animate-fade-up"
         >
-          <span className="inline-flex items-center gap-1 rounded-full bg-ink text-white px-2 py-0.5 text-[10px] font-semibold">
+          <span className="inline-flex items-center gap-1 rounded-full bg-brand text-white px-2 py-0.5 text-[10px] font-semibold">
             <Sparkles className="w-3 h-3" />
             Free
           </span>
@@ -115,7 +124,7 @@ export const Hero: React.FC<HeroProps> = ({ heading, onNavigate, onSelectWord })
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-up [animation-delay:180ms]">
           <a
             href="#finder"
-            className="inline-flex items-center justify-center gap-2 h-11 px-6 rounded-full bg-ink text-white text-sm font-medium hover:bg-slate-800 active:scale-[0.98] transition-all w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 h-11 px-6 rounded-full bg-brand text-white text-sm font-medium hover:bg-brand-hover active:scale-[0.98] transition-all w-full sm:w-auto"
           >
             Start searching
             <ArrowRight className="w-4 h-4" />
@@ -147,10 +156,13 @@ export const Hero: React.FC<HeroProps> = ({ heading, onNavigate, onSelectWord })
       </div>
 
       {/* Word marquee: two rows moving in opposite directions */}
-      <div className="pb-10 sm:pb-14 space-y-1" role="group" aria-label="Example words">
+      <div className="pb-4 sm:pb-6 space-y-1" role="group" aria-label="Example words">
         <MarqueeRow words={rows[0]} direction="left" onSelectWord={onSelectWord} offset={0} />
         <MarqueeRow words={rows[1]} direction="right" onSelectWord={onSelectWord} offset={2} />
       </div>
+
+      {/* Curved divider: hero (white) into the tool area (slate-50) */}
+      <WaveDivider className="text-slate-50 -mb-px" variant="swoosh" />
     </section>
   );
 };

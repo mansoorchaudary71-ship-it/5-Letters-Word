@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { CardBlobs } from './ui/Blobs';
 import { WordEntry, SortOption, FilterState } from '../types/word';
 import { ALL_WORDS } from '../data/words';
 import { copyText } from '../lib/clipboard';
@@ -238,7 +239,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
     patternSlots.some((s) => s !== '');
 
   const inputClass =
-    'w-full h-10 px-3 rounded-xl border border-slate-200 bg-white text-sm font-medium text-ink placeholder:text-slate-400 outline-hidden transition-all focus:border-ink focus:ring-4 focus:ring-ink/5';
+    'w-full h-10 px-3 rounded-xl border border-slate-200 bg-white text-sm font-medium text-ink placeholder:text-slate-400 outline-hidden transition-all focus:border-brand focus:ring-4 focus:ring-brand/5';
   const labelClass = 'block text-xs font-medium text-slate-600 mb-1.5';
   const Heading = asSubheading ? 'h2' : 'h1';
 
@@ -255,7 +256,9 @@ export const WordFinder: React.FC<WordFinderProps> = ({
   return (
     <section id="finder" aria-label="Word finder" className="scroll-mt-24 space-y-6">
       {/* Search card */}
-      <div className="rounded-3xl border border-slate-200 bg-white shadow-card p-4 sm:p-7">
+      <div className="relative isolate">
+        <CardBlobs />
+        <div className="rounded-3xl border border-slate-200 bg-white shadow-card p-4 sm:p-7">
         <div className="max-w-3xl mx-auto space-y-6">
           <div className={asSubheading ? 'text-center' : ''}>
             {asSubheading && <p className="eyebrow mb-3">Word finder</p>}
@@ -288,7 +291,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
                 setFilters((prev) => ({ ...prev, search: e.target.value }));
                 setPage(1);
               }}
-              className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-base font-medium text-ink placeholder:text-slate-400 border border-slate-200 focus:border-ink focus:ring-4 focus:ring-ink/5 outline-hidden transition-all"
+              className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-base font-medium text-ink placeholder:text-slate-400 border border-slate-200 focus:border-brand focus:ring-4 focus:ring-brand/5 outline-hidden transition-all"
             />
             {filters.search && (
               <button
@@ -320,7 +323,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
                   }}
                   className={`shrink-0 h-8 px-3.5 rounded-full text-[13px] font-medium border transition-all ${
                     active
-                      ? 'bg-ink text-white border-ink'
+                      ? 'bg-brand text-white border-brand'
                       : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:text-ink'
                   }`}
                 >
@@ -365,8 +368,8 @@ export const WordFinder: React.FC<WordFinderProps> = ({
                     onKeyDown={(e) => handleSlotKeyDown(idx, e)}
                     className={`w-12 h-14 sm:w-14 sm:h-16 text-center font-semibold text-2xl uppercase rounded-xl border-2 outline-hidden transition-all placeholder:text-slate-300 ${
                       filled
-                        ? 'bg-hit border-hit text-white shadow-card'
-                        : 'bg-white border-slate-200 hover:border-slate-300 focus:border-ink focus:ring-4 focus:ring-ink/5'
+                        ? 'bg-hit border-hit text-ink shadow-card'
+                        : 'bg-white border-slate-200 hover:border-slate-300 focus:border-brand focus:ring-4 focus:ring-brand/5'
                     }`}
                   />
                 );
@@ -524,6 +527,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
           )}
         </div>
       </div>
+      </div>
 
       {/* Results toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
@@ -569,7 +573,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
           <button
             type="button"
             onClick={resetAllFilters}
-            className="inline-flex items-center h-10 px-5 rounded-full bg-ink text-white text-sm font-medium hover:bg-slate-800 active:scale-[0.98] transition-all"
+            className="inline-flex items-center h-10 px-5 rounded-full bg-brand text-white text-sm font-medium hover:bg-brand-hover active:scale-[0.98] transition-all"
           >
             Reset all filters
           </button>
@@ -592,7 +596,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
                 />
 
                 <div className="flex items-start justify-between gap-1">
-                  <WordTiles word={entry.word} size="card" state="soft" className="group-hover:[&>span]:bg-ink group-hover:[&>span]:text-white [&>span]:transition-colors" />
+                  <WordTiles word={entry.word} size="card" state="soft" className="group-hover:[&>span]:bg-brand group-hover:[&>span]:text-white [&>span]:transition-colors" />
                   <button
                     type="button"
                     onClick={(e) => {
@@ -605,7 +609,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
                       isFav ? 'text-ink' : 'text-slate-300 hover:text-ink hover:bg-slate-100'
                     }`}
                   >
-                    <Bookmark className={`w-3.5 h-3.5 ${isFav ? 'fill-ink' : ''}`} />
+                    <Bookmark className={`w-3.5 h-3.5 ${isFav ? 'fill-brand' : ''}`} />
                   </button>
                 </div>
 

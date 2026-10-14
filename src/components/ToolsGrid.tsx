@@ -35,7 +35,7 @@ const DirectoryArt = () => (
       <span
         key={l}
         className={`w-7 h-7 flex items-center justify-center rounded-md text-xs font-semibold ${
-          i === 3 ? 'bg-ink text-white' : 'bg-white text-slate-500 border border-slate-200'
+          i === 3 ? 'bg-brand text-white' : 'bg-white text-slate-500 border border-slate-200'
         }`}
       >
         {l}
@@ -57,7 +57,7 @@ const PracticeArt = () => (
 const StatsArt = () => (
   <div className="flex items-end gap-1.5 h-20" aria-hidden="true">
     {[88, 62, 74, 40, 100, 28, 55, 36, 68].map((h, i) => (
-      <span key={i} className={`w-3.5 rounded-t-md ${i === 4 ? 'bg-ink' : 'bg-slate-300'}`} style={{ height: `${h}%` }} />
+      <span key={i} className={`w-3.5 rounded-t-md ${i === 4 ? 'bg-brand' : 'bg-slate-300'}`} style={{ height: `${h}%` }} />
     ))}
   </div>
 );
@@ -138,7 +138,7 @@ export const ToolsGrid: React.FC<ToolsGridProps> = ({ onNavigate }) => (
               </div>
               <span
                 aria-hidden="true"
-                className="shrink-0 mt-0.5 flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 text-slate-500 group-hover:bg-ink group-hover:text-white group-hover:border-ink transition-colors"
+                className="shrink-0 mt-0.5 flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 text-slate-500 group-hover:bg-brand group-hover:text-white group-hover:border-brand transition-colors"
               >
                 <ArrowUpRight className="w-4 h-4" />
               </span>

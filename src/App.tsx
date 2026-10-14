@@ -98,10 +98,10 @@ export default function App() {
   const navigate = (path: string) => goToPath(path);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans overflow-x-clip">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:rounded-full focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
       >
         Skip to content
       </a>
@@ -120,10 +120,10 @@ export default function App() {
       {isHome && <Hero heading={route.h1} onNavigate={navigate} onSelectWord={setSelectedWord} />}
 
       {/* Main Content Area */}
-      <main id="main-content" className={`grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full ${isHome ? 'pt-10 sm:pt-14' : 'pt-8 sm:pt-10'}`}>
+      <main id="main-content" className={`grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full ${isHome ? 'pt-4 sm:pt-6' : 'pt-8 sm:pt-10'}`}>
         <Breadcrumbs route={route} onNavigate={navigate} />
 
-        <Suspense fallback={<div className="py-24 flex justify-center" role="status" aria-label="Loading"><span className="w-5 h-5 rounded-full border-2 border-slate-200 border-t-ink animate-spin" /></div>}>
+        <Suspense fallback={<div className="py-24 flex justify-center" role="status" aria-label="Loading"><span className="w-5 h-5 rounded-full border-2 border-slate-200 border-t-brand animate-spin" /></div>}>
           {activeTab === 'finder' && (
             <WordFinder
               key={`${finderFilter.startsWith || ''}-${finderFilter.endsWith || ''}-${finderFilter.contains || ''}-${finderFilter.tag || ''}`}

@@ -145,7 +145,7 @@ export const BrowseDirectory: React.FC<BrowseDirectoryProps> = ({
                 onClick={() => setSelectedLetter(letter)}
                 className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all border ${
                   isSelected
-                    ? 'bg-ink text-white border-ink shadow-card scale-105'
+                    ? 'bg-brand text-white border-brand shadow-card scale-105'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border-slate-200'
                 }`}
               >

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { CardBlobs } from './ui/Blobs';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS } from '../data/words';
 import { Shuffle, HelpCircle, ChevronRight, Copy, Check } from 'lucide-react';
@@ -66,7 +67,9 @@ export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) =>
   return (
     <div className="space-y-6">
       {/* Search Container */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
+      <div className="relative isolate">
+        <CardBlobs />
+        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
             <Shuffle className="w-6 h-6 text-ink" />
@@ -85,7 +88,7 @@ export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) =>
               placeholder="Enter your rack letters (e.g. TEARS, A?LE, OUND)..."
               value={lettersInput}
               onChange={(e) => setLettersInput(e.target.value.toUpperCase())}
-              className="w-full px-4 py-3 bg-slate-50 uppercase font-mono font-semibold text-xl tracking-widest text-slate-900 rounded-xl border border-slate-200 focus:bg-white focus:border-ink focus:ring-2 focus:ring-ink/10 outline-hidden transition-all"
+              className="w-full px-4 py-3 bg-slate-50 uppercase font-mono font-semibold text-xl tracking-widest text-slate-900 rounded-xl border border-slate-200 focus:bg-white focus:border-brand focus:ring-2 focus:ring-brand/10 outline-hidden transition-all"
             />
           </div>
 
@@ -118,11 +121,12 @@ export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) =>
               type="checkbox"
               checked={allowSubAnagrams}
               onChange={(e) => setAllowSubAnagrams(e.target.checked)}
-              className="rounded-sm text-ink focus:ring-ink"
+              className="rounded-sm text-brand focus:ring-brand"
             />
             <span>Include partial letter matches (sub-anagrams)</span>
           </label>
         </div>
+      </div>
       </div>
 
       {/* Results Header */}

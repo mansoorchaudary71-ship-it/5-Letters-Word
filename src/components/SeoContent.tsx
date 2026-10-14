@@ -18,7 +18,7 @@ const LinkList: React.FC<{ links: Link[]; onNavigate: Navigate }> = ({ links, on
         <a
           href={withBase(l.path)}
           onClick={(e) => handleNav(e, () => onNavigate(l.path))}
-          className="inline-flex items-center h-9 rounded-full border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 hover:border-ink hover:bg-ink hover:text-white transition-colors"
+          className="inline-flex items-center h-9 rounded-full border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 hover:border-brand hover:bg-brand hover:text-white transition-colors"
         >
           {l.label}
         </a>

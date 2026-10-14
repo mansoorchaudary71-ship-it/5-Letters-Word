@@ -84,7 +84,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         <button
           type="button"
           onClick={onClose}
-          className="w-full h-11 rounded-full bg-ink text-white text-sm font-medium hover:bg-slate-800 active:scale-[0.99] transition-all"
+          className="w-full h-11 rounded-full bg-brand text-white text-sm font-medium hover:bg-brand-hover active:scale-[0.99] transition-all"
         >
           Got it
         </button>

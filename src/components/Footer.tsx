@@ -1,3 +1,4 @@
+import { WaveDivider } from './ui/WaveDivider';
 import React from 'react';
 import { ActiveTab } from './Header';
 import { filterHref, tabHref, withBase } from '../seo/links';
@@ -51,7 +52,11 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, onNavigateToFinder
   ];
 
   return (
-    <footer className="mt-20 sm:mt-28 border-t border-slate-200 bg-white text-sm">
+    <footer className="relative mt-20 sm:mt-28 bg-white text-sm">
+      {/* Curved top edge: slate-50 page into the white footer */}
+      <div aria-hidden="true" className="absolute inset-x-0 bottom-full -mb-px">
+        <WaveDivider className="text-white" variant="layered" />
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-10">
         <div className="grid grid-cols-2 md:grid-cols-12 gap-x-6 gap-y-10">
           {/* Brand */}
@@ -62,7 +67,7 @@ export const Footer: React.FC<FooterProps> = ({ setActiveTab, onNavigateToFinder
               className="inline-flex items-center gap-2.5"
               aria-label="5-Letter Words home"
             >
-              <span aria-hidden="true" className="grid grid-cols-5 gap-[2px] p-[3px] rounded-lg bg-ink">
+              <span aria-hidden="true" className="grid grid-cols-5 gap-[2px] p-[3px] rounded-lg bg-brand">
                 {[0, 1, 2, 3, 4].map((i) => (
                   <span key={i} className={`w-[5px] h-[14px] rounded-[1.5px] ${i === 1 ? 'bg-hit' : i === 3 ? 'bg-near' : 'bg-white/90'}`} />
                 ))}

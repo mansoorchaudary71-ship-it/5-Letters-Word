@@ -32,13 +32,13 @@ export const WordPage: React.FC<WordPageProps> = ({ word, heading, isFavorite, o
           aria-pressed={fav}
           className="inline-flex items-center gap-2 h-10 rounded-full border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 hover:border-slate-300 hover:text-ink transition-colors"
         >
-          <Bookmark className={`w-4 h-4 ${fav ? 'fill-ink text-ink' : ''}`} />
+          <Bookmark className={`w-4 h-4 ${fav ? 'fill-brand text-brand' : ''}`} />
           {fav ? 'Saved' : 'Save word'}
         </button>
         <button
           type="button"
           onClick={() => onSelectWord(entry)}
-          className="inline-flex items-center h-10 rounded-full bg-ink px-5 text-[13px] font-medium text-white hover:bg-slate-800 transition-colors"
+          className="inline-flex items-center h-10 rounded-full bg-brand px-5 text-[13px] font-medium text-white hover:bg-brand-hover transition-colors"
         >
           Open full detail
         </button>

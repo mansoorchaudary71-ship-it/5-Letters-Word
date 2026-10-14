@@ -74,7 +74,7 @@ export const LetterStatsView: React.FC = () => {
                 onClick={() => setActivePos(pos)}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   activePos === pos
-                    ? 'bg-ink text-white shadow-card'
+                    ? 'bg-brand text-white shadow-card'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -125,7 +125,7 @@ export const LetterStatsView: React.FC = () => {
               <div key={item.letter} className="flex items-center gap-3 text-xs">
                 <div className="w-8 flex items-center gap-1">
                   <span className="text-[10px] font-semibold text-slate-400 w-3">{idx + 1}</span>
-                  <span className={`font-semibold text-sm ${isVowel ? 'text-amber-600' : 'text-slate-900'}`}>
+                  <span className={`font-semibold text-sm ${isVowel ? 'text-amber-700' : 'text-slate-900'}`}>
                     {item.letter}
                   </span>
                 </div>
@@ -133,7 +133,7 @@ export const LetterStatsView: React.FC = () => {
                 <div className="grow bg-slate-100 h-5 rounded-md overflow-hidden relative">
                   <div
                     className={`h-full rounded-md transition-all ${
-                      isVowel ? 'bg-amber-500' : 'bg-emerald-600'
+                      isVowel ? 'bg-near' : 'bg-brand'
                     }`}
                     style={{ width: barWidth }}
                   />

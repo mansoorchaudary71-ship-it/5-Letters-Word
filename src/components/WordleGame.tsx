@@ -249,14 +249,14 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
 
                 let tileBg = 'bg-white border-slate-300 text-slate-900';
                 if (char && !color) {
-                  tileBg = 'bg-white border-slate-500 text-slate-900 scale-102';
+                  tileBg = 'bg-white border-brand text-slate-900 scale-102';
                 }
                 if (color === 'green') {
-                  tileBg = 'bg-emerald-600 border-emerald-600 text-white shadow-card';
+                  tileBg = 'bg-hit border-hit text-ink shadow-card';
                 } else if (color === 'yellow') {
-                  tileBg = 'bg-amber-500 border-amber-500 text-white shadow-card';
+                  tileBg = 'bg-near border-near text-ink shadow-card';
                 } else if (color === 'gray') {
-                  tileBg = 'bg-slate-500 border-slate-500 text-white';
+                  tileBg = 'bg-miss border-miss text-white';
                 }
 
                 return (
@@ -297,7 +297,7 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
 
               <button
                 onClick={() => onSelectWord(targetEntry)}
-                className="flex items-center gap-1.5 px-3 py-2 bg-ink hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-card transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 bg-brand hover:bg-brand-hover text-white font-bold text-xs rounded-xl shadow-card transition-colors"
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 View Definition &amp; Clues
@@ -319,11 +319,11 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
               const status = letterStatuses[key];
               let keyBg = 'bg-slate-200 hover:bg-slate-300 text-slate-800';
               if (status === 'green') {
-                keyBg = 'bg-emerald-600 text-white font-bold';
+                keyBg = 'bg-hit text-ink font-bold';
               } else if (status === 'yellow') {
-                keyBg = 'bg-amber-500 text-white font-bold';
+                keyBg = 'bg-near text-ink font-bold';
               } else if (status === 'gray') {
-                keyBg = 'bg-slate-400 text-slate-100 opacity-60';
+                keyBg = 'bg-miss text-white';
               }
 
               const isAction = key === 'ENTER' || key === 'DEL';

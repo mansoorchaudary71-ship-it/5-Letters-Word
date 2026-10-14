@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { CardBlobs } from './ui/Blobs';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS } from '../data/words';
 import { scoreWordForWordle } from '../data/letterStats';
@@ -130,11 +131,13 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
   return (
     <div className="space-y-6">
       {/* Solver Instructions Header */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card">
+      <div className="relative isolate">
+        <CardBlobs />
+        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-ink" />
+              <Sparkles className="w-6 h-6 text-brand" />
               Wordle Solver &amp; Helper
             </h1>
             <p className="text-sm text-slate-500 mt-1">
@@ -154,14 +157,14 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
         {/* Input Sections */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-6">
           {/* 1. GREEN LETTERS */}
-          <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 space-y-3">
+          <div className="bg-hit/10 border border-hit/40 rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-ink tracking-wider flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+              <span className="text-xs font-bold uppercase text-emerald-900 tracking-wider flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-hit"></span>
                 1. Correct Positions (Green)
               </span>
             </div>
-            <p className="text-[11px] text-ink">Letters in the right spot</p>
+            <p className="text-[11px] text-emerald-800">Letters in the right spot</p>
             <div className="flex items-center justify-between gap-1.5 sm:gap-2">
               {[0, 1, 2, 3, 4].map((idx) => (
                 <input
@@ -172,17 +175,20 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
                   value={greens[idx]}
                   placeholder="_"
                   onChange={(e) => handleGreenChange(idx, e.target.value)}
-                  className="w-11 h-12 text-center font-semibold text-xl uppercase bg-emerald-600 text-white rounded-lg shadow-card border-2 border-emerald-700 focus:ring-2 focus:ring-ink/10 outline-hidden"
+                  aria-label={`Correct letter in position ${idx + 1}`}
+                  className={`w-11 h-12 text-center font-semibold text-xl uppercase rounded-lg border-2 outline-hidden transition-colors placeholder:text-emerald-700/40 focus:ring-4 focus:ring-hit/30 ${
+                    greens[idx] ? 'bg-hit border-hit-dark text-ink shadow-card' : 'bg-white border-hit/50 text-slate-900'
+                  }`}
                 />
               ))}
             </div>
           </div>
 
           {/* 2. YELLOW LETTERS */}
-          <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-4 space-y-3">
+          <div className="bg-near/10 border border-near/40 rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase text-amber-800 tracking-wider flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-near"></span>
                 2. Present In Word (Yellow)
               </span>
             </div>
@@ -197,7 +203,10 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
                   placeholder={`≠`}
                   onChange={(e) => handleYellowSlotChange(idx, e.target.value)}
                   title={`Letters NOT at position ${idx + 1}`}
-                  className="w-11 h-12 text-center font-bold text-sm uppercase bg-amber-400 text-amber-950 rounded-lg shadow-card border-2 border-amber-500 focus:ring-2 focus:ring-amber-300 outline-hidden"
+                  aria-label={`Letters not in position ${idx + 1}`}
+                  className={`w-11 h-12 text-center font-bold text-sm uppercase rounded-lg border-2 outline-hidden transition-colors placeholder:text-amber-700/50 focus:ring-4 focus:ring-near/30 ${
+                    yellowSlots[idx] ? 'bg-near border-near-dark text-ink shadow-card' : 'bg-white border-near/50 text-slate-900'
+                  }`}
                 />
               ))}
             </div>
@@ -210,16 +219,16 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
                 placeholder="e.g. E, R, T"
                 value={mustContain}
                 onChange={(e) => setMustContain(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
-                className="w-full px-2.5 py-1.5 bg-white uppercase font-bold text-xs rounded-lg border border-amber-300 focus:border-amber-500 outline-hidden"
+                className="w-full px-2.5 py-1.5 bg-white uppercase font-bold text-xs rounded-lg border border-near/50 focus:border-near-dark focus:ring-4 focus:ring-near/30 outline-hidden"
               />
             </div>
           </div>
 
           {/* 3. GRAY LETTERS */}
-          <div className="bg-slate-100/80 border border-slate-300 rounded-xl p-4 space-y-3">
+          <div className="bg-miss/10 border border-miss/40 rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-miss"></span>
                 3. Ruled Out Letters (Gray)
               </span>
             </div>
@@ -229,7 +238,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
               placeholder="Type ruled out letters (e.g. B, C, D, M, P, U)..."
               value={grays}
               onChange={(e) => setGrays(e.target.value.toUpperCase().replace(/[^A-Z]/g, ''))}
-              className="w-full px-3 py-2 bg-white text-slate-900 font-mono font-bold text-sm uppercase rounded-lg border border-slate-300 focus:border-slate-500 outline-hidden resize-none"
+              className="w-full px-3 py-2 bg-white text-slate-900 font-mono font-bold text-sm uppercase rounded-lg border border-miss/50 focus:border-miss focus:ring-4 focus:ring-miss/25 outline-hidden resize-none"
             />
             {grays && (
               <div className="flex flex-wrap gap-1">
@@ -238,7 +247,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
                     key={ch}
                     onClick={() => setGrays(grays.replace(new RegExp(ch, 'g'), ''))}
                     title="Click to remove from excluded"
-                    className="cursor-pointer px-1.5 py-0.5 bg-slate-600 hover:bg-rose-600 text-white font-mono text-[10px] font-bold rounded"
+                    className="cursor-pointer px-1.5 py-0.5 bg-miss hover:bg-rose-600 text-white font-mono text-[10px] font-bold rounded"
                   >
                     {ch} ×
                   </span>
@@ -247,6 +256,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
             )}
           </div>
         </div>
+      </div>
       </div>
 
       {/* Recommended Next Guesses Banner */}
@@ -295,14 +305,14 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
       {/* Matching Words Grid */}
       {matchingWords.length === 0 ? (
         <div className="bg-white rounded-2xl p-10 text-center border border-slate-200">
-          <AlertCircle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+          <AlertCircle className="w-8 h-8 text-near-dark mx-auto mb-2" />
           <p className="text-base font-bold text-slate-800">No matching words found</p>
           <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
             Please check your clues. You might have contradictory green, yellow, or gray letters.
           </p>
           <button
             onClick={handleReset}
-            className="mt-4 px-4 py-2 bg-ink text-white font-medium text-xs rounded-full hover:bg-slate-800"
+            className="mt-4 px-4 py-2 bg-brand text-white font-medium text-xs rounded-full hover:bg-brand-hover"
           >
             Reset Clues
           </button>

@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <span
               aria-hidden="true"
-              className="grid grid-cols-5 gap-[2px] p-[3px] rounded-lg bg-ink transition-transform duration-300 group-hover:rotate-[-4deg]"
+              className="grid grid-cols-5 gap-[2px] p-[3px] rounded-lg bg-brand transition-transform duration-300 group-hover:rotate-[-4deg]"
             >
               {[0, 1, 2, 3, 4].map((i) => (
                 <span
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={(e) => handleNav(e, () => setActiveTab(item.id))}
                   aria-current={active ? 'page' : undefined}
                   className={`px-3 py-1.5 rounded-full text-[13px] font-medium transition-colors ${
-                    active ? 'bg-slate-100 text-ink' : 'text-slate-500 hover:text-ink hover:bg-slate-50'
+                    active ? 'bg-brand-soft text-brand font-semibold' : 'text-slate-500 hover:text-ink hover:bg-slate-100'
                   }`}
                 >
                   {item.label}
@@ -135,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Bookmark className="w-4 h-4" />
               {savedCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 rounded-full bg-ink text-white text-[10px] font-semibold flex items-center justify-center">
+                <span className="absolute top-0.5 right-0.5 min-w-4 h-4 px-1 rounded-full bg-brand text-white text-[10px] font-semibold flex items-center justify-center">
                   {savedCount > 99 ? '99+' : savedCount}
                 </span>
               )}
@@ -166,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
                 aria-current={active ? 'page' : undefined}
                 className={`flex items-center gap-1.5 h-8 px-3 whitespace-nowrap rounded-full text-xs font-medium shrink-0 border transition-colors ${
                   active
-                    ? 'bg-ink text-white border-ink'
+                    ? 'bg-brand text-white border-brand'
                     : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                 }`}
               >
