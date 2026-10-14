@@ -3,6 +3,7 @@ import { ArrowRight } from './ui/Icons';
 import { tabHref } from '../seo/links';
 import { WordTiles } from './ui/WordTiles';
 import { Blob, Squiggle } from './ui/Blobs';
+import { WaveBackground } from './ui/WaveBackground';
 
 interface CtaBandProps {
   onNavigate: (path: string) => void;
@@ -22,6 +23,7 @@ export const CtaBand: React.FC<CtaBandProps> = ({ onNavigate }) => (
         aria-hidden="true"
         className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_60%_80%_at_50%_100%,#000,transparent_80%)]"
       />
+      <WaveBackground variant="dense" className="absolute inset-0 w-full h-full text-brand opacity-50" />
       <Blob className="absolute -top-20 -right-16 w-72 text-brand opacity-40" />
       <Squiggle className="absolute bottom-6 left-6 w-28 text-brand opacity-60 hidden sm:block" />
       <div className="relative">

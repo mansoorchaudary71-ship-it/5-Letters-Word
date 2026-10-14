@@ -3,6 +3,7 @@ import { ArrowUpRight } from './ui/Icons';
 import { tabHref } from '../seo/links';
 import { Tab } from '../seo/routes';
 import { WordTiles } from './ui/WordTiles';
+import { WaveBackground } from './ui/WaveBackground';
 
 interface ToolsGridProps {
   onNavigate: (path: string) => void;
@@ -109,7 +110,12 @@ const TOOLS: {
 ];
 
 export const ToolsGrid: React.FC<ToolsGridProps> = ({ onNavigate }) => (
-  <section aria-labelledby="tools-heading" className="mt-20 sm:mt-28">
+  <section aria-labelledby="tools-heading" className="relative isolate mt-20 sm:mt-28">
+    {/* Full-bleed abstract waves behind the section heading */}
+    <WaveBackground
+      variant="calm"
+      className="absolute -z-10 left-1/2 -translate-x-1/2 -top-10 w-screen h-72 text-indigo-200/70 [mask-image:linear-gradient(to_bottom,transparent,#000_35%,#000_65%,transparent)]"
+    />
     <div className="max-w-2xl">
       <p className="eyebrow">The toolkit</p>
       <h2 id="tools-heading" className="mt-3 text-3xl sm:text-4xl font-semibold tracking-[-0.035em] text-ink text-balance">

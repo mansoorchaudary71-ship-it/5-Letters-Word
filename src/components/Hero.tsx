@@ -6,6 +6,7 @@ import { tabHref } from '../seo/links';
 import { TileState, WordTiles } from './ui/WordTiles';
 import { WaveDivider } from './ui/WaveDivider';
 import { Blob } from './ui/Blobs';
+import { WaveBackground } from './ui/WaveBackground';
 
 interface HeroProps {
   heading: string;
@@ -91,6 +92,12 @@ export const Hero: React.FC<HeroProps> = ({ heading, onNavigate, onSelectWord })
       {/* Organic corner blobs */}
       <Blob className="absolute -z-10 -top-16 -right-16 w-64 sm:w-96 text-indigo-100" />
       <Blob className="absolute -z-10 top-40 -left-24 w-56 sm:w-80 text-amber-100 opacity-80" />
+
+      {/* Abstract line waves flowing behind the lower half of the hero */}
+      <WaveBackground
+        variant="flow"
+        className="absolute -z-10 inset-x-0 bottom-0 w-full h-3/5 text-indigo-300/60 [mask-image:linear-gradient(to_bottom,transparent,#000_30%,#000_70%,transparent)]"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-10 sm:pb-14 text-center">
         <a

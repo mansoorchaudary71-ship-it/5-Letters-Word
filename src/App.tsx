@@ -11,6 +11,7 @@ import { Hero } from './components/Hero';
 import { ToolsGrid } from './components/ToolsGrid';
 import { CtaBand } from './components/CtaBand';
 import { CommandPalette } from './components/CommandPalette';
+import { WaveBackground } from './components/ui/WaveBackground';
 import { useFavorites } from './hooks/useFavorites';
 import { ALL_WORDS } from './data/words';
 import { WordEntry } from './types/word';
@@ -120,7 +121,14 @@ export default function App() {
       {isHome && <Hero heading={route.h1} onNavigate={navigate} onSelectWord={setSelectedWord} />}
 
       {/* Main Content Area */}
-      <main id="main-content" className={`grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full ${isHome ? 'pt-4 sm:pt-6' : 'pt-8 sm:pt-10'}`}>
+      <main id="main-content" className={`relative isolate grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full ${isHome ? 'pt-4 sm:pt-6' : 'pt-8 sm:pt-10'}`}>
+        {/* Inner pages: full-bleed abstract waves fading out under the page header */}
+        {!isHome && (
+          <WaveBackground
+            variant="flow"
+            className="absolute -z-10 left-1/2 -translate-x-1/2 top-0 w-screen h-60 sm:h-72 text-indigo-200/60 [mask-image:linear-gradient(to_bottom,#000,transparent)]"
+          />
+        )}
         <Breadcrumbs route={route} onNavigate={navigate} />
 
         <Suspense fallback={<div className="py-24 flex justify-center" role="status" aria-label="Loading"><span className="w-5 h-5 rounded-full border-2 border-slate-200 border-t-brand animate-spin" /></div>}>
