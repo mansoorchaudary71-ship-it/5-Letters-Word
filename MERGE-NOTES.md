@@ -4,8 +4,8 @@ Copy these files over the same paths in your repo (they are the Vite + Tailwind 
 No new dependencies. Run `npm run lint && npm run build` after merging.
 
 ## New files
-- `src/components/ui/WaveDivider.tsx`  curved section divider (3 variants, inline SVG, responsive)
-- `src/components/ui/Blobs.tsx`        `CardBlobs`: organic blobs + squiggle behind a tool card
+- `src/components/ui/WaveDivider.tsx`  curved section divider (3 variants, inline SVG built from polygon + polyline, no <path>)
+- `src/components/ui/Blobs.tsx`        `CardBlobs`: blobs (ellipses), squiggle (polyline), line burst (line) behind a tool card
 
 ## Palette (all in `src/index.css`)
 | Token | Value | Use |

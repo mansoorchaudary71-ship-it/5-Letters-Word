@@ -3,38 +3,71 @@ import React from 'react';
 type WaveVariant = 'swoosh' | 'soft' | 'layered';
 
 interface WaveDividerProps {
-  /**
-   * Colour of the section that sits BELOW the wave, set with a text colour class
-   * (e.g. "text-slate-50"). The wave is filled with `currentColor`.
-   */
+  /** Colour of the section BELOW the wave, as a text colour class (e.g. "text-slate-50"). */
   className?: string;
   variant?: WaveVariant;
-  /** Mirror vertically, for a divider that sits at the top of a section instead of the bottom. */
+  /** Mirror vertically, for a divider at the top of a section. */
   flip?: boolean;
 }
 
-// All paths share a 1440 x 120 viewBox and close along the bottom edge.
-const PATHS: Record<WaveVariant, string[]> = {
-  swoosh: ['M0 64C180 12 360 8 560 40s400 78 600 52c110-14 190-44 280-72V120H0Z'],
-  soft: ['M0 80C240 20 480 20 720 56s480 52 720-8V120H0Z'],
-  // Front wave plus a faint, offset echo behind it
+const W = 1440;
+const H = 120;
+const STEP = 20;
+
+/** Sample a sine wave into polyline points ("x,y x,y ..."). No <path> needed. */
+const wavePoints = (base: number, amp: number, cycles: number, phase: number): string => {
+  const pts: string[] = [];
+  for (let x = 0; x <= W; x += STEP) {
+    const y = base + amp * Math.sin((x / W) * cycles * Math.PI * 2 + phase);
+    pts.push(`${x},${y.toFixed(1)}`);
+  }
+  return pts.join(' ');
+};
+
+const WAVES: Record<WaveVariant, { base: number; amp: number; cycles: number; phase: number }[]> = {
+  swoosh: [{ base: 62, amp: 30, cycles: 1.1, phase: 0.6 }],
+  soft: [{ base: 70, amp: 22, cycles: 1.5, phase: 2.2 }],
   layered: [
-    'M0 44C220 92 420 100 660 64s520-64 780-4V120H0Z',
-    'M0 78C200 36 400 28 640 62s500 50 800-10V120H0Z',
+    { base: 74, amp: 24, cycles: 1.2, phase: 1.4 }, // faint echo behind
+    { base: 66, amp: 28, cycles: 1.0, phase: 3.4 }, // front wave
   ],
 };
 
-/** Full-bleed curved section divider. Inline SVG, scales to any width, ignored by assistive tech. */
-export const WaveDivider: React.FC<WaveDividerProps> = ({ className = 'text-slate-50', variant = 'swoosh', flip = false }) => (
-  <svg
-    aria-hidden="true"
-    focusable="false"
-    viewBox="0 0 1440 120"
-    preserveAspectRatio="none"
-    className={`block w-full h-10 sm:h-14 lg:h-20 ${flip ? 'rotate-180' : ''} ${className}`}
-  >
-    {PATHS[variant].map((d, i) => (
-      <path key={i} d={d} fill="currentColor" opacity={PATHS[variant].length > 1 && i === 0 ? 0.55 : 1} />
-    ))}
-  </svg>
-);
+/**
+ * Full-bleed curved divider built only from <polygon> (fill) and <polyline> (crest line).
+ * Inline SVG, scales to any width, hidden from assistive tech.
+ */
+export const WaveDivider: React.FC<WaveDividerProps> = ({ className = 'text-slate-50', variant = 'swoosh', flip = false }) => {
+  const waves = WAVES[variant];
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="none"
+      className={`block w-full h-10 sm:h-14 lg:h-20 ${flip ? 'rotate-180' : ''} ${className}`}
+    >
+      {waves.map((w, i) => {
+        const pts = wavePoints(w.base, w.amp, w.cycles, w.phase);
+        const isFront = i === waves.length - 1;
+        return (
+          <g key={i}>
+            <polygon points={`${pts} ${W},${H} 0,${H}`} fill="currentColor" opacity={isFront ? 1 : 0.5} />
+            {/* Thin indigo crest line along the front wave */}
+            {isFront && (
+              <polyline
+                points={pts}
+                fill="none"
+                className="stroke-indigo-300/70"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            )}
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
