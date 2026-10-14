@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS } from '../data/words';
-import { 
-  X, Bookmark, Trash2, Copy, Check, Download, BookOpen, ChevronRight 
-} from 'lucide-react';
+import { copyText } from '../lib/clipboard';
+import { useDialog } from '../hooks/useDialog';
+import { WordTiles } from './ui/WordTiles';
+import { X, Bookmark, Trash2, Copy, Check, Download, BookOpen } from 'lucide-react';
 
 interface FavoritesDrawerProps {
   isOpen: boolean;
@@ -25,20 +26,21 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
   const [copied, setCopied] = useState(false);
   const [flashcardIndex, setFlashcardIndex] = useState<number | null>(null);
   const [revealMeaning, setRevealMeaning] = useState(false);
+  const panelRef = useDialog<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
   const favoriteEntries = ALL_WORDS.filter((w) => favorites.includes(w.word));
 
-  const handleCopyAll = () => {
-    navigator.clipboard.writeText(favorites.join(', '));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyAll = async () => {
+    if (await copyText(favorites.join(', '))) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleExportTXT = () => {
-    const content = favorites.join('\n');
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([favorites.join('\n')], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -48,186 +50,190 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({
   };
 
   const activeFlashcard = flashcardIndex !== null ? favoriteEntries[flashcardIndex] : null;
+  const ghostBtn =
+    'h-9 px-4 rounded-full border border-slate-200 bg-white text-[13px] font-medium text-slate-700 hover:border-slate-300 hover:text-ink disabled:opacity-40 disabled:pointer-events-none transition-colors';
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-xs animate-in fade-in"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex justify-end bg-ink/40 backdrop-blur-sm animate-fade" onMouseDown={onClose}>
       <div
-        className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between"
-        onClick={(e) => e.stopPropagation()}
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="saved-title"
+        tabIndex={-1}
+        className="w-full max-w-md h-full bg-white shadow-pop flex flex-col outline-hidden animate-slide-in"
+        onMouseDown={(e) => e.stopPropagation()}
       >
-        {/* Drawer Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-200 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Bookmark className="w-5 h-5 text-amber-500 fill-amber-500" />
-            <h2 className="font-extrabold text-lg text-slate-900">
-              Saved Word List ({favorites.length})
+        {/* Header */}
+        <div className="px-5 h-16 shrink-0 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Bookmark className="w-[18px] h-[18px] fill-ink" />
+            <h2 id="saved-title" className="font-semibold tracking-tight text-ink">
+              Saved words <span className="text-slate-400 font-normal tabular-nums">({favorites.length})</span>
             </h2>
           </div>
-
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition-colors"
+            aria-label="Close"
+            className="flex items-center justify-center w-9 h-9 -mr-2 rounded-full text-slate-500 hover:text-ink hover:bg-slate-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-[18px] h-[18px]" />
           </button>
         </div>
 
-        {/* Content Body */}
-        <div className="grow p-4 sm:p-5 overflow-y-auto space-y-4">
-          {/* Flashcard Study Mode Popup if active */}
-          {flashcardIndex !== null && activeFlashcard ? (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 space-y-3">
+        {/* Body */}
+        <div className="grow overflow-y-auto p-5 space-y-4">
+          {flashcardIndex !== null && activeFlashcard && (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                  Flashcard {flashcardIndex + 1} of {favoriteEntries.length}
+                <span className="eyebrow">
+                  Card {flashcardIndex + 1} of {favoriteEntries.length}
                 </span>
                 <button
+                  type="button"
                   onClick={() => setFlashcardIndex(null)}
-                  className="text-xs text-emerald-700 underline font-semibold"
+                  className="text-xs font-medium text-slate-500 hover:text-ink underline underline-offset-4"
                 >
-                  Exit Study Mode
+                  Exit
                 </button>
               </div>
 
-              <div className="text-center py-4">
-                <h3 className="text-3xl font-black text-slate-900 tracking-widest">
-                  {activeFlashcard.word}
-                </h3>
-                <span className="text-xs text-slate-500 font-semibold mt-1 inline-block">
-                  {activeFlashcard.scrabbleScore} Scrabble Points • {activeFlashcard.partOfSpeech}
-                </span>
+              <div className="text-center py-3 space-y-3">
+                <WordTiles word={activeFlashcard.word} size="md" state="ink" className="justify-center" />
+                <p className="text-xs text-slate-500">
+                  {activeFlashcard.scrabbleScore} points &middot; {activeFlashcard.partOfSpeech}
+                </p>
               </div>
 
               {revealMeaning ? (
-                <div className="bg-white p-3 rounded-xl border border-emerald-200 text-xs text-slate-700">
-                  <strong>Meaning:</strong> {activeFlashcard.definition}
+                <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700 leading-relaxed">
+                  {activeFlashcard.definition}
                   {activeFlashcard.example && (
-                    <p className="italic text-slate-500 mt-1">&quot;{activeFlashcard.example}&quot;</p>
+                    <p className="italic text-slate-500 mt-2">&ldquo;{activeFlashcard.example}&rdquo;</p>
                   )}
                 </div>
               ) : (
                 <button
+                  type="button"
                   onClick={() => setRevealMeaning(true)}
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                  className="w-full h-10 rounded-full bg-ink text-white text-[13px] font-medium hover:bg-slate-800 transition-colors"
                 >
-                  Reveal Definition
+                  Reveal definition
                 </button>
               )}
 
-              <div className="flex justify-between pt-2">
+              <div className="flex justify-between">
                 <button
+                  type="button"
                   disabled={flashcardIndex === 0}
                   onClick={() => {
                     setRevealMeaning(false);
                     setFlashcardIndex((prev) => (prev !== null ? prev - 1 : 0));
                   }}
-                  className="px-3 py-1 bg-white disabled:opacity-40 text-slate-700 font-bold text-xs rounded-lg border border-slate-200"
+                  className={ghostBtn}
                 >
                   Previous
                 </button>
                 <button
+                  type="button"
                   disabled={flashcardIndex === favoriteEntries.length - 1}
                   onClick={() => {
                     setRevealMeaning(false);
                     setFlashcardIndex((prev) => (prev !== null ? prev + 1 : 0));
                   }}
-                  className="px-3 py-1 bg-white disabled:opacity-40 text-slate-700 font-bold text-xs rounded-lg border border-slate-200"
+                  className={ghostBtn}
                 >
-                  Next Word
+                  Next
                 </button>
               </div>
             </div>
-          ) : null}
+          )}
 
-          {/* Words List */}
           {favoriteEntries.length === 0 ? (
-            <div className="text-center py-12 text-slate-400 space-y-2">
-              <Bookmark className="w-10 h-10 mx-auto text-slate-300" />
-              <p className="font-bold text-slate-600">No saved words yet</p>
-              <p className="text-xs">
-                Click the bookmark star on any word in the finder to save it here for studying.
+            <div className="text-center py-16 space-y-3">
+              <span className="mx-auto flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-100 text-slate-400">
+                <Bookmark className="w-5 h-5" />
+              </span>
+              <p className="font-semibold text-ink">No saved words yet</p>
+              <p className="text-sm text-slate-500 max-w-xs mx-auto">
+                Tap the bookmark on any word to keep it here for studying.
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <ul className="space-y-2">
               {favoriteEntries.map((item) => (
-                <div
+                <li
                   key={item.word}
-                  onClick={() => onSelectWord(item)}
-                  className="flex items-center justify-between p-3 bg-slate-50 hover:bg-emerald-50 rounded-xl border border-slate-200/80 cursor-pointer group transition-colors"
+                  className="group relative flex items-center justify-between gap-3 p-3.5 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-lift transition-all"
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-black text-base tracking-wider text-slate-900 group-hover:text-emerald-700">
-                        {item.word}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
-                        {item.scrabbleScore} pts
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
-                      {item.definition}
-                    </p>
-                  </div>
-
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onToggleFavorite(item.word);
-                    }}
-                    title="Remove from saved"
-                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-white transition-colors"
+                    type="button"
+                    onClick={() => onSelectWord(item)}
+                    aria-label={`${item.word}: view definition`}
+                    className="absolute inset-0 rounded-2xl"
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2.5">
+                      <WordTiles word={item.word} size="xs" state="soft" />
+                      <span className="text-[11px] font-medium text-slate-500 tabular-nums">{item.scrabbleScore} pts</span>
+                    </div>
+                    <p className="text-xs text-slate-500 line-clamp-1 mt-1.5">{item.definition}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onToggleFavorite(item.word)}
+                    aria-label={`Remove ${item.word} from saved words`}
+                    className="relative z-10 shrink-0 flex items-center justify-center w-8 h-8 rounded-full text-slate-400 hover:text-red-600 hover:bg-slate-100 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </div>
 
-        {/* Drawer Footer Actions */}
+        {/* Footer */}
         {favoriteEntries.length > 0 && (
-          <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-2">
+          <div className="shrink-0 p-4 border-t border-slate-100 bg-slate-50/70 space-y-3">
             <div className="grid grid-cols-2 gap-2">
               <button
+                type="button"
                 onClick={() => {
                   setFlashcardIndex(0);
                   setRevealMeaning(false);
                 }}
-                className="flex items-center justify-center gap-1.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 h-10 rounded-full bg-ink text-white text-[13px] font-medium hover:bg-slate-800 transition-colors"
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                Study Flashcards
+                Study
               </button>
-
               <button
+                type="button"
                 onClick={handleCopyAll}
-                className="flex items-center justify-center gap-1.5 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 h-10 rounded-full border border-slate-200 bg-white text-[13px] font-medium text-slate-700 hover:border-slate-300 hover:text-ink transition-colors"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                {copied ? 'Copied All!' : 'Copy List'}
+                {copied ? <Check className="w-3.5 h-3.5 text-hit" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? 'Copied' : 'Copy list'}
               </button>
             </div>
-
-            <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center justify-between px-1">
               <button
+                type="button"
                 onClick={handleExportTXT}
-                className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-ink transition-colors"
               >
                 <Download className="w-3 h-3" />
                 Download TXT
               </button>
-
               <button
+                type="button"
                 onClick={onClearFavorites}
-                className="flex items-center gap-1 text-[11px] font-semibold text-rose-600 hover:text-rose-700"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-red-600 transition-colors"
               >
                 <Trash2 className="w-3 h-3" />
-                Clear All
+                Clear all
               </button>
             </div>
           </div>

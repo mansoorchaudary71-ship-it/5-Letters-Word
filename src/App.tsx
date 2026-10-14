@@ -1,31 +1,87 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Header, ActiveTab } from './components/Header';
 import { WordFinder } from './components/WordFinder';
-import { WordleSolver } from './components/WordleSolver';
-import { AnagramSolver } from './components/AnagramSolver';
-import { BrowseDirectory } from './components/BrowseDirectory';
-import { WordleGame } from './components/WordleGame';
-import { LetterStatsView } from './components/LetterStatsView';
 import { WordDetailModal } from './components/WordDetailModal';
 import { FavoritesDrawer } from './components/FavoritesDrawer';
 import { HelpModal } from './components/HelpModal';
 import { Footer } from './components/Footer';
+import { WordPage } from './components/WordPage';
+import { Breadcrumbs, SeoContent } from './components/SeoContent';
+import { Hero } from './components/Hero';
+import { ToolsGrid } from './components/ToolsGrid';
+import { CtaBand } from './components/CtaBand';
+import { CommandPalette } from './components/CommandPalette';
 import { useFavorites } from './hooks/useFavorites';
 import { ALL_WORDS } from './data/words';
 import { WordEntry } from './types/word';
+import { Filter, HOME_ROUTE, RouteInfo, filterPath, resolveRoute, tabPath } from './seo/routes';
+import { applyRouteHead, withBase } from './seo/links';
+
+// Secondary tools are split into their own chunks so the home page (the word finder) loads less JavaScript.
+const WordleSolver = lazy(() => import('./components/WordleSolver').then((m) => ({ default: m.WordleSolver })));
+const AnagramSolver = lazy(() => import('./components/AnagramSolver').then((m) => ({ default: m.AnagramSolver })));
+const BrowseDirectory = lazy(() => import('./components/BrowseDirectory').then((m) => ({ default: m.BrowseDirectory })));
+const WordleGame = lazy(() => import('./components/WordleGame').then((m) => ({ default: m.WordleGame })));
+const LetterStatsView = lazy(() => import('./components/LetterStatsView').then((m) => ({ default: m.LetterStatsView })));
+
+const BASE = import.meta.env.BASE_URL || '/';
+const routeFromLocation = (): RouteInfo => resolveRoute(window.location.pathname, BASE) ?? HOME_ROUTE;
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('finder');
+  // The URL decides which tool (and which filter) is shown, so every tool has its own indexable page.
+  const [route, setRoute] = useState<RouteInfo>(routeFromLocation);
   const [selectedWord, setSelectedWord] = useState<WordEntry | null>(null);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Filter state passed from Browse / Footer into WordFinder
-  const [finderFilter, setFinderFilter] = useState<{
-    startsWith?: string;
-    endsWith?: string;
-    tag?: string;
-  }>({});
+  const [finderFilter, setFinderFilter] = useState<Filter>(route.filter);
+  const activeTab: ActiveTab = route.tab;
+  const isHome = route.path === '/';
+
+  // Browser back / forward buttons
+  useEffect(() => {
+    const onPop = () => {
+      const r = routeFromLocation();
+      setRoute(r);
+      setFinderFilter(r.filter);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Global shortcuts: Ctrl/Cmd+K or "/" opens search
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const typing = !!target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable);
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((o) => !o);
+      } else if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Keep <title>, description, canonical and social tags correct on every navigation
+  useEffect(() => {
+    applyRouteHead(route);
+  }, [route]);
+
+  const goToPath = (path: string, filter?: Filter) => {
+    const next = resolveRoute(path, '/') ?? HOME_ROUTE;
+    window.history.pushState({}, '', withBase(next.path));
+    setRoute(next);
+    setFinderFilter(filter ?? next.filter);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const setActiveTab = (tab: ActiveTab) => goToPath(tabPath(tab));
 
   const { favorites, toggleFavorite, isFavorite, clearFavorites } = useFavorites();
 
@@ -34,18 +90,22 @@ export default function App() {
     setSelectedWord(random);
   };
 
-  const handleNavigateToFinderWithFilter = (filter: {
-    startsWith?: string;
-    endsWith?: string;
-    tag?: string;
-  }) => {
-    setFinderFilter(filter);
-    setActiveTab('finder');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleNavigateToFinderWithFilter = (filter: Filter) => {
+    // Filters with a dedicated page get their own URL; others stay on the finder page.
+    goToPath(filterPath(filter) ?? '/', filter);
   };
 
+  const navigate = (path: string) => goToPath(path);
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-white flex flex-col font-sans">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[70] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
+      >
+        Skip to content
+      </a>
+
       {/* Top Navigation */}
       <Header
         activeTab={activeTab}
@@ -54,44 +114,57 @@ export default function App() {
         onOpenFavorites={() => setIsFavoritesOpen(true)}
         onRandomWord={handleRandomWord}
         onOpenHelp={() => setIsHelpOpen(true)}
+        onOpenSearch={() => setIsSearchOpen(true)}
       />
 
+      {isHome && <Hero heading={route.h1} onNavigate={navigate} onSelectWord={setSelectedWord} />}
+
       {/* Main Content Area */}
-      <main className="grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 w-full">
-        {activeTab === 'finder' && (
-          <WordFinder
-            key={`${finderFilter.startsWith || ''}-${finderFilter.endsWith || ''}-${finderFilter.tag || ''}`}
-            onSelectWord={setSelectedWord}
+      <main id="main-content" className={`grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full ${isHome ? 'pt-10 sm:pt-14' : 'pt-8 sm:pt-10'}`}>
+        <Breadcrumbs route={route} onNavigate={navigate} />
+
+        <Suspense fallback={<div className="py-24 flex justify-center" role="status" aria-label="Loading"><span className="w-5 h-5 rounded-full border-2 border-slate-200 border-t-ink animate-spin" /></div>}>
+          {activeTab === 'finder' && (
+            <WordFinder
+              key={`${finderFilter.startsWith || ''}-${finderFilter.endsWith || ''}-${finderFilter.contains || ''}-${finderFilter.tag || ''}`}
+              onSelectWord={setSelectedWord}
+              isFavorite={isFavorite}
+              onToggleFavorite={toggleFavorite}
+              initialStartsWith={finderFilter.startsWith || ''}
+              initialEndsWith={finderFilter.endsWith || ''}
+              initialContains={finderFilter.contains || ''}
+              initialTag={finderFilter.tag || 'all'}
+              heading={route.h1}
+              asSubheading={isHome}
+            />
+          )}
+
+          {activeTab === 'solver' && <WordleSolver onSelectWord={setSelectedWord} />}
+
+          {activeTab === 'anagram' && <AnagramSolver onSelectWord={setSelectedWord} />}
+
+          {activeTab === 'browse' && (
+            <BrowseDirectory onSelectWord={setSelectedWord} onNavigateToFinderWithFilter={handleNavigateToFinderWithFilter} />
+          )}
+
+          {activeTab === 'game' && <WordleGame onSelectWord={setSelectedWord} />}
+
+          {activeTab === 'stats' && <LetterStatsView />}
+        </Suspense>
+
+        {activeTab === 'word' && route.wordSlug && (
+          <WordPage
+            word={route.wordSlug}
+            heading={route.h1}
             isFavorite={isFavorite}
             onToggleFavorite={toggleFavorite}
-            initialStartsWith={finderFilter.startsWith || ''}
-            initialEndsWith={finderFilter.endsWith || ''}
-            initialTag={finderFilter.tag || 'all'}
-          />
-        )}
-
-        {activeTab === 'solver' && (
-          <WordleSolver onSelectWord={setSelectedWord} />
-        )}
-
-        {activeTab === 'anagram' && (
-          <AnagramSolver onSelectWord={setSelectedWord} />
-        )}
-
-        {activeTab === 'browse' && (
-          <BrowseDirectory
             onSelectWord={setSelectedWord}
-            onNavigateToFinderWithFilter={handleNavigateToFinderWithFilter}
           />
         )}
 
-        {activeTab === 'game' && (
-          <WordleGame onSelectWord={setSelectedWord} />
-        )}
+        {isHome && <ToolsGrid onNavigate={navigate} />}
 
-        {activeTab === 'stats' && (
-          <LetterStatsView />
-        )}
+        <SeoContent route={route} onNavigate={navigate} variant={activeTab === 'article' ? 'article' : 'under-tool'} />
       </main>
 
       {/* Word Detail Modal */}
@@ -119,10 +192,20 @@ export default function App() {
       {/* Help & Rules Modal */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
+      <CommandPalette
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onNavigate={navigate}
+        onSelectWord={setSelectedWord}
+      />
+
+      <CtaBand onNavigate={navigate} />
+
       {/* Footer */}
       <Footer
         setActiveTab={setActiveTab}
         onNavigateToFinderWithFilter={handleNavigateToFinderWithFilter}
+        onNavigate={navigate}
       />
     </div>
   );

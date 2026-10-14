@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { WordEntry } from '../types/word';
 import { ALL_WORDS, WORDS_SET } from '../data/words';
 import { RotateCcw, Trophy, Sparkles, BookOpen, Share2, Check } from 'lucide-react';
+import { copyText } from '../lib/clipboard';
 
 interface WordleGameProps {
   onSelectWord: (word: WordEntry) => void;
@@ -187,7 +188,7 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
           .join('');
       })
       .join('\n');
-    navigator.clipboard.writeText(header + rows);
+    void copyText(header + rows);
     setCopiedShare(true);
     setTimeout(() => setCopiedShare(false), 2000);
   };
@@ -205,18 +206,18 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
   return (
     <div className="max-w-xl mx-auto space-y-6">
       {/* Title & Stats Bar */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex items-center justify-between">
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-card flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
+          <h1 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-500" />
-            Daily 5-Letter Word Challenge
+            Wordle Practice: Unlimited 5-Letter Word Game
           </h1>
           <p className="text-xs text-slate-500">Practice Wordle unlimited times with instant definition lookup</p>
         </div>
 
         <button
           onClick={handleNewGame}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-xl border border-emerald-200 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs rounded-full border border-slate-200 transition-colors"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           New Word
@@ -251,9 +252,9 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
                   tileBg = 'bg-white border-slate-500 text-slate-900 scale-102';
                 }
                 if (color === 'green') {
-                  tileBg = 'bg-emerald-600 border-emerald-600 text-white shadow-xs';
+                  tileBg = 'bg-emerald-600 border-emerald-600 text-white shadow-card';
                 } else if (color === 'yellow') {
-                  tileBg = 'bg-amber-500 border-amber-500 text-white shadow-xs';
+                  tileBg = 'bg-amber-500 border-amber-500 text-white shadow-card';
                 } else if (color === 'gray') {
                   tileBg = 'bg-slate-500 border-slate-500 text-white';
                 }
@@ -261,7 +262,7 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
                 return (
                   <div
                     key={colIdx}
-                    className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center font-black text-xl sm:text-2xl uppercase rounded-xl border-2 transition-all duration-200 select-none ${tileBg}`}
+                    className={`w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center font-semibold text-xl sm:text-2xl uppercase rounded-xl border-2 transition-all duration-200 select-none ${tileBg}`}
                   >
                     {char}
                   </div>
@@ -280,7 +281,7 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 The Target Word Was:
               </span>
-              <h3 className="text-2xl font-black text-emerald-700 tracking-wider">
+              <h3 className="text-2xl font-semibold text-ink tracking-wider">
                 {targetWord}
               </h3>
             </div>
@@ -290,13 +291,13 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
                 onClick={handleShareGrid}
                 className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
               >
-                {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
+                {copiedShare ? <Check className="w-3.5 h-3.5 text-ink" /> : <Share2 className="w-3.5 h-3.5" />}
                 {copiedShare ? 'Copied Grid!' : 'Share Grid'}
               </button>
 
               <button
                 onClick={() => onSelectWord(targetEntry)}
-                className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 bg-ink hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-card transition-colors"
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 View Definition &amp; Clues
@@ -331,7 +332,7 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
                 <button
                   key={key}
                   onClick={() => handleKeyPress(key)}
-                  className={`h-11 sm:h-12 flex items-center justify-center font-bold text-xs sm:text-sm rounded-lg active:scale-95 transition-all shadow-2xs ${
+                  className={`h-11 sm:h-12 flex items-center justify-center font-bold text-xs sm:text-sm rounded-lg active:scale-95 transition-all shadow-card ${
                     isAction ? 'px-3 sm:px-4 text-[10px] sm:text-xs bg-slate-300 text-slate-800' : 'w-8 sm:w-10'
                   } ${keyBg}`}
                 >
@@ -346,21 +347,21 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
       {/* Quick Player Stats */}
       <div className="grid grid-cols-4 gap-2 bg-white rounded-xl p-3 border border-slate-200 text-center text-xs">
         <div>
-          <div className="font-black text-base text-slate-900">{stats.played}</div>
+          <div className="font-semibold text-base text-slate-900">{stats.played}</div>
           <div className="text-[10px] text-slate-400 font-medium">Played</div>
         </div>
         <div>
-          <div className="font-black text-base text-slate-900">
+          <div className="font-semibold text-base text-slate-900">
             {stats.played > 0 ? Math.round((stats.won / stats.played) * 100) : 0}%
           </div>
           <div className="text-[10px] text-slate-400 font-medium">Win %</div>
         </div>
         <div>
-          <div className="font-black text-base text-emerald-600">{stats.streak}</div>
+          <div className="font-semibold text-base text-ink">{stats.streak}</div>
           <div className="text-[10px] text-slate-400 font-medium">Current Streak</div>
         </div>
         <div>
-          <div className="font-black text-base text-amber-500">{stats.maxStreak}</div>
+          <div className="font-semibold text-base text-amber-500">{stats.maxStreak}</div>
           <div className="text-[10px] text-slate-400 font-medium">Max Streak</div>
         </div>
       </div>

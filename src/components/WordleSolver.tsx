@@ -3,6 +3,7 @@ import { WordEntry } from '../types/word';
 import { ALL_WORDS } from '../data/words';
 import { scoreWordForWordle } from '../data/letterStats';
 import { Sparkles, RotateCcw, AlertCircle, Copy, Check, ChevronRight } from 'lucide-react';
+import { copyText } from '../lib/clipboard';
 
 interface WordleSolverProps {
   onSelectWord: (word: WordEntry) => void;
@@ -121,7 +122,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
   }, [matchingWords]);
 
   const handleCopyWord = (word: string) => {
-    navigator.clipboard.writeText(word);
+    void copyText(word);
     setCopiedWord(word);
     setTimeout(() => setCopiedWord(null), 2000);
   };
@@ -129,12 +130,12 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
   return (
     <div className="space-y-6">
       {/* Solver Instructions Header */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-xs">
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-emerald-600" />
-              Interactive Wordle Solver &amp; Assistant
+            <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-ink" />
+              Wordle Solver &amp; Helper
             </h1>
             <p className="text-sm text-slate-500 mt-1">
               Enter known Green (correct position), Yellow (present letters), and Gray (absent) clues to instantly uncover remaining solutions.
@@ -155,12 +156,12 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
           {/* 1. GREEN LETTERS */}
           <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-emerald-800 tracking-wider flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase text-ink tracking-wider flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
                 1. Correct Positions (Green)
               </span>
             </div>
-            <p className="text-[11px] text-emerald-700">Letters in the right spot</p>
+            <p className="text-[11px] text-ink">Letters in the right spot</p>
             <div className="flex items-center justify-between gap-1.5 sm:gap-2">
               {[0, 1, 2, 3, 4].map((idx) => (
                 <input
@@ -171,7 +172,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
                   value={greens[idx]}
                   placeholder="_"
                   onChange={(e) => handleGreenChange(idx, e.target.value)}
-                  className="w-11 h-12 text-center font-black text-xl uppercase bg-emerald-600 text-white rounded-lg shadow-2xs border-2 border-emerald-700 focus:ring-2 focus:ring-emerald-400 outline-hidden"
+                  className="w-11 h-12 text-center font-semibold text-xl uppercase bg-emerald-600 text-white rounded-lg shadow-card border-2 border-emerald-700 focus:ring-2 focus:ring-ink/10 outline-hidden"
                 />
               ))}
             </div>
@@ -196,7 +197,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
                   placeholder={`≠`}
                   onChange={(e) => handleYellowSlotChange(idx, e.target.value)}
                   title={`Letters NOT at position ${idx + 1}`}
-                  className="w-11 h-12 text-center font-bold text-sm uppercase bg-amber-400 text-amber-950 rounded-lg shadow-2xs border-2 border-amber-500 focus:ring-2 focus:ring-amber-300 outline-hidden"
+                  className="w-11 h-12 text-center font-bold text-sm uppercase bg-amber-400 text-amber-950 rounded-lg shadow-card border-2 border-amber-500 focus:ring-2 focus:ring-amber-300 outline-hidden"
                 />
               ))}
             </div>
@@ -250,11 +251,11 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
 
       {/* Recommended Next Guesses Banner */}
       {topRecommendations.length > 0 && matchingWords.length > 1 && (
-        <div className="bg-linear-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-4 sm:p-5 shadow-sm space-y-2">
+        <div className="bg-ink text-white rounded-2xl p-4 sm:p-5 shadow-sm space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-amber-300" />
-              <h2 className="font-extrabold text-base tracking-tight">
+              <h2 className="font-semibold text-base tracking-tight">
                 Top Statistically Recommended Next Guesses
               </h2>
             </div>
@@ -262,7 +263,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
               Eliminates Most Possibilities
             </span>
           </div>
-          <p className="text-xs text-emerald-100">
+          <p className="text-xs text-slate-400">
             These words test the most frequent remaining letters to narrow down the target word fastest:
           </p>
 
@@ -271,7 +272,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
               <button
                 key={rec.word}
                 onClick={() => onSelectWord(rec)}
-                className="group flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-900 hover:bg-emerald-50 rounded-xl font-black text-sm tracking-widest shadow-xs transition-all hover:scale-105"
+                className="group flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-900 hover:bg-slate-100 rounded-xl font-semibold text-sm tracking-widest shadow-card transition-all hover:scale-105"
               >
                 <span>{rec.word}</span>
                 <span className="text-[10px] text-slate-400 font-normal">({rec.scrabbleScore} pts)</span>
@@ -284,7 +285,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
       {/* Results Header */}
       <div className="flex items-center justify-between px-1">
         <div>
-          <h3 className="text-lg font-extrabold text-slate-900">
+          <h3 className="text-lg font-semibold text-slate-900">
             {matchingWords.length.toLocaleString()}{' '}
             <span className="text-slate-500 font-normal">Valid Words Remaining</span>
           </h3>
@@ -301,7 +302,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
           </p>
           <button
             onClick={handleReset}
-            className="mt-4 px-4 py-2 bg-emerald-600 text-white font-semibold text-xs rounded-xl hover:bg-emerald-700"
+            className="mt-4 px-4 py-2 bg-ink text-white font-medium text-xs rounded-full hover:bg-slate-800"
           >
             Reset Clues
           </button>
@@ -312,10 +313,10 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
             <div
               key={wordEntry.word}
               onClick={() => onSelectWord(wordEntry)}
-              className="bg-white hover:bg-emerald-50/50 p-3 rounded-xl border border-slate-200 hover:border-emerald-300 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between cursor-pointer group"
+              className="bg-white hover:bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-slate-300 shadow-card hover:shadow-card transition-all flex flex-col justify-between cursor-pointer group"
             >
               <div className="flex items-center justify-between">
-                <span className="font-black text-base tracking-widest text-slate-900 group-hover:text-emerald-700">
+                <span className="font-semibold text-base tracking-widest text-slate-900 group-hover:text-ink">
                   {wordEntry.word}
                 </span>
 
@@ -326,10 +327,10 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
                     handleCopyWord(wordEntry.word);
                   }}
                   title="Copy word"
-                  className="p-1 text-slate-300 hover:text-emerald-600 rounded transition-colors"
+                  className="p-1 text-slate-300 hover:text-ink rounded transition-colors"
                 >
                   {copiedWord === wordEntry.word ? (
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <Check className="w-3.5 h-3.5 text-ink" />
                   ) : (
                     <Copy className="w-3.5 h-3.5" />
                   )}
@@ -342,7 +343,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
 
               <div className="flex items-center justify-between text-[10px] text-slate-400 mt-2 pt-1.5 border-t border-slate-100">
                 <span>{wordEntry.scrabbleScore} pts</span>
-                <span className="font-semibold text-emerald-600 flex items-center group-hover:translate-x-0.5 transition-transform">
+                <span className="font-semibold text-ink flex items-center group-hover:translate-x-0.5 transition-transform">
                   Details <ChevronRight className="w-2.5 h-2.5 ml-0.5" />
                 </span>
               </div>

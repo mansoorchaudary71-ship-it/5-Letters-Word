@@ -1,81 +1,92 @@
 import React from 'react';
-import { X, HelpCircle, Sparkles, BookOpen, Trophy } from 'lucide-react';
+import { X, Sparkles, BookOpen, Trophy } from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 
 interface HelpModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const Dot: React.FC<{ className: string }> = ({ className }) => (
+  <span aria-hidden="true" className={`inline-block w-2.5 h-2.5 rounded-[3px] mr-2 ${className}`} />
+);
+
 export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
+  const panelRef = useDialog<HTMLDivElement>(isOpen, onClose);
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in"
-      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-ink/40 backdrop-blur-sm animate-fade"
+      onMouseDown={onClose}
     >
       <div
-        className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative max-h-[85vh] overflow-y-auto space-y-5"
-        onClick={(e) => e.stopPropagation()}
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="help-title"
+        tabIndex={-1}
+        className="w-full sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-white border border-slate-200 shadow-pop outline-hidden p-6 sm:p-8 space-y-6 animate-pop-in"
+        onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-emerald-600" />
-            <h2 className="font-extrabold text-lg text-slate-900">
-              How to Use 5-Letter Words
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="eyebrow">Guide</p>
+            <h2 id="help-title" className="mt-2 text-xl font-semibold tracking-tight text-ink">
+              How to use 5-Letter Words
             </h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
+            aria-label="Close"
+            className="flex items-center justify-center w-9 h-9 -mr-2 -mt-1 rounded-full text-slate-500 hover:text-ink hover:bg-slate-100 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-[18px] h-[18px]" />
           </button>
         </div>
 
-        <div className="space-y-4 text-xs text-slate-600 leading-relaxed">
-          <div className="space-y-1">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-emerald-600" />
-              Wordle Solver Clue Logic
+        <div className="space-y-6 text-sm text-slate-600 leading-relaxed">
+          <section className="space-y-2">
+            <h3 className="font-semibold text-ink flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Wordle solver clues
             </h3>
-            <p>
-              • <strong>Green (Correct position):</strong> Type letters you know are in the exact slot (1 to 5).
-            </p>
-            <p>
-              • <strong>Yellow (Present in word):</strong> Enter letters that exist somewhere in the word, along with slots where they cannot appear.
-            </p>
-            <p>
-              • <strong>Gray (Absent):</strong> Add all letters ruled out by previous guesses to eliminate them instantly.
-            </p>
-          </div>
+            <p><Dot className="bg-hit" /><strong className="text-ink font-medium">Green:</strong> letters in the exact slot (1 to 5).</p>
+            <p><Dot className="bg-near" /><strong className="text-ink font-medium">Yellow:</strong> letters in the word, plus the slots they cannot be in.</p>
+            <p><Dot className="bg-miss" /><strong className="text-ink font-medium">Grey:</strong> letters ruled out by earlier guesses.</p>
+          </section>
 
-          <div className="space-y-1">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-              <Trophy className="w-4 h-4 text-amber-500" />
-              Scrabble &amp; Words With Friends Points
+          <section className="space-y-2">
+            <h3 className="font-semibold text-ink flex items-center gap-2">
+              <Trophy className="w-4 h-4" />
+              Scrabble &amp; Words With Friends
             </h3>
-            <p>
-              Every 5-letter word displays official tournament point scores computed from individual letter values (e.g. Q=10, Z=10, J=8, X=8, K=5).
-            </p>
-          </div>
+            <p>Every word shows tile-value scores (for example Q and Z are 10, J and X are 8, K is 5).</p>
+          </section>
 
-          <div className="space-y-1">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-              <BookOpen className="w-4 h-4 text-blue-500" />
-              Pattern &amp; Wildcards
+          <section className="space-y-2">
+            <h3 className="font-semibold text-ink flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              Wildcards &amp; shortcuts
             </h3>
             <p>
-              In the Anagram solver, use <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded font-mono font-bold">?</code> or <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded font-mono font-bold">*</code> for blank wildcard tiles.
+              In the anagram solver, use{' '}
+              <code className="px-1.5 py-0.5 rounded-md bg-slate-100 font-mono text-xs font-semibold text-ink">?</code> or{' '}
+              <code className="px-1.5 py-0.5 rounded-md bg-slate-100 font-mono text-xs font-semibold text-ink">*</code> for blank tiles.
+              Press{' '}
+              <kbd className="px-1.5 py-0.5 rounded-md bg-slate-100 text-xs font-semibold text-ink font-sans">Ctrl / ⌘ K</kbd> or{' '}
+              <kbd className="px-1.5 py-0.5 rounded-md bg-slate-100 text-xs font-semibold text-ink font-sans">/</kbd> anywhere to search.
             </p>
-          </div>
+          </section>
         </div>
 
         <button
+          type="button"
           onClick={onClose}
-          className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors shadow-xs"
+          className="w-full h-11 rounded-full bg-ink text-white text-sm font-medium hover:bg-slate-800 active:scale-[0.99] transition-all"
         >
-          Got It, Start Finding Words!
+          Got it
         </button>
       </div>
     </div>

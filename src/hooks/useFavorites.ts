@@ -4,9 +4,10 @@ export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       const stored = localStorage.getItem('fav_5letter_words');
-      return stored ? JSON.parse(stored) : ['ADIEU', 'CRANE', 'GLYPH', 'PIZZA', 'KAYAK'];
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
-      return ['ADIEU', 'CRANE', 'GLYPH', 'PIZZA', 'KAYAK'];
+      return [];
     }
   });
 

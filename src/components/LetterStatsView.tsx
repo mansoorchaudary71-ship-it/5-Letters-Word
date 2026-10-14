@@ -21,10 +21,10 @@ export const LetterStatsView: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-xs">
-        <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
-          <BarChart3 className="w-6 h-6 text-emerald-600" />
-          5-Letter English Word Frequency &amp; Heatmap
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card">
+        <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
+          <BarChart3 className="w-6 h-6 text-ink" />
+          Letter Frequency in 5-Letter Words
         </h1>
         <p className="text-sm text-slate-500 mt-1">
           Strategic letter distribution analytics across 5-letter words to supercharge your Wordle and Scrabble game.
@@ -33,19 +33,19 @@ export const LetterStatsView: React.FC = () => {
 
       {/* Top Openers Strategy Cards */}
       <div className="space-y-3">
-        <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-emerald-600" />
+        <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-ink" />
           Best Statistically Proven Wordle Starters
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {topOpeners.map((op) => (
-            <div key={op.word} className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
+            <div key={op.word} className="bg-white p-4 rounded-xl border border-slate-200 shadow-card space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-black text-xl tracking-widest text-emerald-700">
+                <span className="font-semibold text-xl tracking-widest text-ink">
                   {op.word}
                 </span>
-                <span className="text-[11px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">
                   {op.vowels} Vowels • {op.consonants} Consonants
                 </span>
               </div>
@@ -56,10 +56,10 @@ export const LetterStatsView: React.FC = () => {
       </div>
 
       {/* Position Heatmap Table */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-xs space-y-4">
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-extrabold text-slate-900">
+            <h2 className="text-lg font-semibold text-slate-900">
               Position-by-Position Letter Frequency
             </h2>
             <p className="text-xs text-slate-500">
@@ -74,7 +74,7 @@ export const LetterStatsView: React.FC = () => {
                 onClick={() => setActivePos(pos)}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   activePos === pos
-                    ? 'bg-emerald-600 text-white shadow-2xs'
+                    ? 'bg-ink text-white shadow-card'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -91,7 +91,7 @@ export const LetterStatsView: React.FC = () => {
               key={item.letter}
               className={`p-3 rounded-xl border flex flex-col items-center justify-center transition-colors ${
                 idx === 0
-                  ? 'bg-emerald-50 border-emerald-300'
+                  ? 'bg-slate-100 border-slate-300'
                   : idx < 4
                   ? 'bg-slate-50 border-slate-200'
                   : 'bg-white border-slate-100'
@@ -99,9 +99,9 @@ export const LetterStatsView: React.FC = () => {
             >
               <div className="flex items-center gap-1">
                 <span className="text-[10px] font-bold text-slate-400">#{idx + 1}</span>
-                <span className="font-black text-xl text-slate-900">{item.letter}</span>
+                <span className="font-semibold text-xl text-slate-900">{item.letter}</span>
               </div>
-              <span className="text-xs font-bold text-emerald-700 mt-0.5">
+              <span className="text-xs font-bold text-ink mt-0.5">
                 {item.percentage}%
               </span>
               <span className="text-[10px] text-slate-400">({item.count} words)</span>
@@ -111,8 +111,8 @@ export const LetterStatsView: React.FC = () => {
       </div>
 
       {/* Overall Letter Frequency Chart */}
-      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-xs space-y-4">
-        <h2 className="text-lg font-extrabold text-slate-900">
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
+        <h2 className="text-lg font-semibold text-slate-900">
           Overall Letter Frequency in 5-Letter English Words
         </h2>
 
@@ -125,7 +125,7 @@ export const LetterStatsView: React.FC = () => {
               <div key={item.letter} className="flex items-center gap-3 text-xs">
                 <div className="w-8 flex items-center gap-1">
                   <span className="text-[10px] font-semibold text-slate-400 w-3">{idx + 1}</span>
-                  <span className={`font-black text-sm ${isVowel ? 'text-amber-600' : 'text-slate-900'}`}>
+                  <span className={`font-semibold text-sm ${isVowel ? 'text-amber-600' : 'text-slate-900'}`}>
                     {item.letter}
                   </span>
                 </div>

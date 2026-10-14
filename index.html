@@ -2,56 +2,29 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>
-      (function() {
-        try {
-          var origFetch = window.fetch;
-          var activeFetch = typeof origFetch === 'function' ? origFetch.bind(window) : origFetch;
-          Object.defineProperty(window, 'fetch', {
-            configurable: true,
-            enumerable: true,
-            get: function() {
-              return activeFetch;
-            },
-            set: function(val) {
-              activeFetch = val;
-            }
-          });
-        } catch (err) {
-          // Safe fallback
-        }
-      })();
-    </script>
-    <title>5-Letter Words - Word Finder, Solver &amp; Dictionary</title>
-    <meta name="description" content="The ultimate 5-letter words directory, Wordle solver, Scrabble helper, and vocabulary finder with definitions and letter filters." />
-    <meta property="og:title" content="5-Letter Words - Word Finder, Solver &amp; Dictionary" />
-    <meta property="og:description" content="The ultimate 5-letter words directory, Wordle solver, Scrabble helper, and vocabulary finder with definitions and letter filters." />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="5-Letter Words" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="5-Letter Words - Word Finder, Solver &amp; Dictionary" />
-    <meta name="twitter:description" content="The ultimate 5-letter words directory, Wordle solver, Scrabble helper, and vocabulary finder with definitions and letter filters." />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310B981'/%3E%3Ctext x='16' y='23' font-size='20' font-weight='bold' font-family='sans-serif' text-anchor='middle' fill='white'%3E5%3C/text%3E%3C/svg%3E" />
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "5-Letter Words Finder & Solver",
-      "applicationCategory": "EducationalApplication",
-      "operatingSystem": "All",
-      "description": "Comprehensive 5-letter words directory, official Wordle solver, Scrabble point calculator, and dictionary with definition lookup.",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
-    }
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <meta name="format-detection" content="telephone=no" />
+    <!-- Title, description, canonical, robots, Open Graph, Twitter and JSON-LD tags are generated per page by scripts/generate-seo-pages.ts (content lives in src/seo/). -->
+    <title>5-Letter Words: Word Finder, Wordle Solver &amp; Scrabble Helper</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- Inter (variable). display=swap keeps text visible while the font loads; the system stack is the fallback. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" /></noscript>
+    <style>
+      /* Prevents a white/grey flash before the stylesheet loads */
+      html { background: #fff; }
+    </style>
   </head>
-  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-emerald-500 selection:text-white">
+  <body class="bg-white text-ink antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
