@@ -6,9 +6,10 @@ import { copyText } from '../lib/clipboard';
 
 interface WordleGameProps {
   onSelectWord: (word: WordEntry) => void;
+  heading?: string;
 }
 
-export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
+export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord, heading = 'Wordle Practice: Free Unlimited Wordle Game' }) => {
   // Pool of candidate target words (common/wordle answers)
   const targetPool = useMemo(() => {
     return ALL_WORDS.filter((w) => w.isWordleAnswer && w.isCommon);
@@ -210,9 +211,9 @@ export const WordleGame: React.FC<WordleGameProps> = ({ onSelectWord }) => {
         <div>
           <h1 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-500" />
-            Wordle Practice: Unlimited 5-Letter Word Game
+            {heading}
           </h1>
-          <p className="text-xs text-slate-500">Practice Wordle unlimited times with instant definition lookup</p>
+          <p className="text-xs text-slate-500">Free unlimited Wordle practice: six guesses, random 5-letter words and a definition after every round</p>
         </div>
 
         <button

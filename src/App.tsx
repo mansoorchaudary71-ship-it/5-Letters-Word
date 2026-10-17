@@ -185,7 +185,7 @@ export default function App() {
             <BrowseDirectory onSelectWord={setSelectedWord} onNavigateToFinderWithFilter={handleNavigateToFinderWithFilter} />
           )}
 
-          {activeTab === 'game' && <WordleGame onSelectWord={setSelectedWord} />}
+          {activeTab === 'game' && <WordleGame onSelectWord={setSelectedWord} heading={route.h1} />}
 
           {activeTab === 'stats' && <LetterStatsView heading={route.h1} />}
         </Suspense>

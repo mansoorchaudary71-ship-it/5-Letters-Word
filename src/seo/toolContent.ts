@@ -3,7 +3,7 @@
 // Keep it factual and specific to the tool: thin or templated copy is what search engines discount.
 import type { Faq, Section } from './routes';
 import { ENGLISH_LETTER_FREQUENCY, computeOverallFrequencies, computePositionalFrequencies } from '../data/letterStats';
-import { ALL_WORDS } from '../data/words';
+import { ALL_WORDS, WORDS_SET } from '../data/words';
 
 // Numbers quoted in the /letter-frequency/ copy are computed from the word list, so the text can never drift from the charts.
 const LF = (() => {
@@ -60,6 +60,17 @@ const LF = (() => {
     enPct: (L: string) => en[L].toFixed(2),
     englishOrder: ENGLISH_LETTER_FREQUENCY.map((x) => x.letter).join(', '),
     englishList: ENGLISH_LETTER_FREQUENCY.map((x) => `${x.letter} ${x.percentage.toFixed(2)}%`).join(', '),
+  };
+})();
+
+// Numbers quoted in the /wordle-practice/ copy come from the same word lists the game uses.
+const WP = (() => {
+  const pool = ALL_WORDS.filter((w) => w.isWordleAnswer && w.isCommon).length;
+  const missing = ['GUCKS', 'VIBEX'].filter((w) => !WORDS_SET.has(w));
+  return {
+    dict: ALL_WORDS.length.toLocaleString('en-US'),
+    pool: pool.toLocaleString('en-US'),
+    notAccepted: missing.length === 0 ? 'all five are accepted here' : `${missing.join(' and ')} ${missing.length === 1 ? 'is' : 'are'} not in this game's dictionary, so ${missing.length === 1 ? 'it' : 'they'} would be rejected as a guess`,
   };
 })();
 
@@ -177,34 +188,164 @@ export const TOOL_CONTENT: Record<string, ExtraContent> = {
   '/wordle-practice/': {
     sections: [
       {
-        heading: 'How the practice game works',
+        heading: 'How to play Wordle practice',
         body: [
-          'A random five-letter word is chosen for each round. Type a valid word and press Enter: letters in the right place turn green, letters that are in the word but in another place turn yellow, and letters that are not in the word turn grey. You have six guesses to find the answer, and the on-screen keyboard keeps track of which letters you have already tested.',
-          'When a round ends, you can open the answer to read its definition and see its anagrams, so every game also adds to your vocabulary. Your streak and win statistics are stored in your own browser; nothing is sent to a server.',
+          'Guess the hidden five-letter word in six tries. Type a word on your keyboard or tap the on-screen keys, press Enter, and every letter is scored against the answer. Use the colors to narrow down your next guess.',
+        ],
+        subsections: [
+          {
+            heading: 'What the green, yellow and grey tiles mean',
+            body: [
+              'A green tile is the right letter in the right place. A yellow tile is a letter that is in the word but in a different place. A grey tile is a letter that is not in the word, or one more copy of a letter than the word contains: if you guess ERASE and the answer has only one E, just one E is colored and the other is grey.',
+              'The on-screen keyboard remembers the best result for every letter you have tried, so you can see at a glance which letters are still untested.',
+            ],
+          },
+          {
+            heading: 'Valid guesses and the six-guess limit',
+            body: [
+              `Every guess must be a real word from the game's dictionary of ${WP.dict} five-letter words. A guess that is too short or not in the list shakes the row and does not use up one of your six tries. Answers are drawn from ${WP.pool} common five-letter words that appear in Wordle answer lists, so you practice on everyday words like the ones in the daily puzzle.`,
+            ],
+          },
+          {
+            heading: 'Playing on a computer or phone',
+            body: [
+              'Use a physical keyboard (Enter to submit, Backspace to delete) or tap the on-screen keyboard. The game runs in your browser, so there is nothing to download and no app store: it works the same on phones, tablets and computers.',
+            ],
+          },
         ],
       },
       {
-        heading: 'What to practise',
+        heading: 'Unlimited free Wordle practice games online',
         body: [
-          'Pick one opening word and use it for a week. Notice which letters it tests and how often it leaves you with too many candidates. Then practise your second guess: try to use five new letters instead of repeating grey ones. Finally, practise rhyme traps, where several words differ by only one letter, by choosing a word that separates them rather than guessing one at random.',
-          'Because rounds are unlimited, you can repeat a difficult pattern until the strategy feels automatic, something the single daily puzzle does not allow.',
+          'Press New Word at any time and a fresh random word starts instantly. There is no daily limit, no wait for tomorrow and no sign-up, so you can play one round to warm up or twenty in a row to drill a pattern. The game is free to use.',
+        ],
+        subsections: [
+          {
+            heading: 'Wordle practice vs the daily puzzle',
+            body: [
+              'The daily puzzle gives everyone the same single word once a day. Practice gives you as many words as you want, picked at random, so there is no archive of past practice words and no "today\'s practice answer" to look up: the answer appears only when your round ends. This site is independent and does not publish the daily Wordle answer or hints for it.',
+              'If you are stuck on a daily puzzle, enter your clues into the Wordle Solver instead; it lists the words that still fit without giving away more than you ask for.',
+            ],
+          },
+          {
+            heading: 'Learn the answer after each round',
+            body: [
+              'When a round ends the answer is revealed with its definition. Choose View Definition & Clues to open the full entry, including its meaning, Scrabble score and anagrams, so every game also adds to your vocabulary.',
+            ],
+          },
+          {
+            heading: 'Track your practice progress',
+            body: [
+              `The stats bar shows games played, win percentage, current streak and best streak. Only completed rounds count, so pressing New Word in the middle of a round does not affect your record. Stats are saved in your browser on this device: they persist between visits but do not sync to other devices, and clearing site data resets them. With ${WP.pool} possible answers you can play many rounds before seeing a repeat, though repeats are possible because words are picked at random.`,
+            ],
+          },
         ],
       },
       {
-        heading: 'Share and compare',
+        heading: 'How to get better at Wordle with practice',
         body: [
-          'After a round you can copy a result grid made of coloured squares to share with friends without revealing the answer. It is a quick way to compare how many guesses each of you needed on the same word.',
+          'Wordle rewards a repeatable method more than inspiration, and unlimited rounds are the cheapest way to build one. The goal of each practice round is not only to win but to notice how much each guess narrowed the list of possible words.',
+        ],
+        subsections: [
+          {
+            heading: 'Practice with one starting word',
+            body: [
+              'Choose one opening word and use it for 20 rounds. Notice which letters it tests and how often it leaves you with too many candidates, then try a different opener and compare your win rate in the stats bar. The list of best Wordle starting words explains the trade-offs between popular choices such as CRANE, SLATE and ADIEU.',
+            ],
+          },
+          {
+            heading: 'How to solve Wordle in three guesses',
+            body: [
+              'A three-guess solve needs two guesses that remove most of the list. Open with a word made of common letters, build your second guess from five new letters if the first told you little, and guess a plausible answer only once a handful of candidates remain. After a round, enter your guesses into the Wordle Solver to see how many words each one left. Luck plays a part, but this routine raises your odds.',
+            ],
+          },
+          {
+            heading: 'Practice double letters and tricky patterns',
+            body: [
+              'Words with repeated letters, such as SPEED, cause many lost games because the colors for the second copy are easy to misread. When you have two guesses left and several words that differ by a single letter, pick a guess that contains the differing letters rather than gambling on one of them.',
+            ],
+          },
+          {
+            heading: 'Wordle practice for beginners and kids',
+            body: [
+              'New players can use the practice game to learn how the tiles work without the pressure of a single daily attempt. There is no account to create and no personal information to enter, and the definition shown after each round makes it a gentle way for children and learners of English to build vocabulary with ordinary words.',
+            ],
+          },
+        ],
+      },
+      {
+        heading: 'Play Wordle practice with friends',
+        body: [
+          'This is a single-player game: there is no live multiplayer, shared room or account. Every round uses a different random word, so you and a friend will normally have different answers.',
+          'To compare results, finish a round and choose Share Grid. It copies a grid of colored squares with your score out of six (or X for a loss) that you can paste into a message without revealing the answer. Then challenge each other to beat the same number of guesses.',
+        ],
+      },
+      {
+        heading: 'Wordle practice modes and difficulty',
+        body: [
+          'There is one mode: five letters, six guesses, and any word from the dictionary is accepted as a guess. There is no hard-mode switch, timer, custom difficulty or six-letter version.',
+          'You can make your own hard mode: after every guess, use only words that keep each green letter in place and include each yellow letter. Practicing that discipline here prepares you for the Hard Mode setting in the official game.',
+        ],
+      },
+      {
+        heading: 'Why use a dedicated Wordle practice game',
+        body: [
+          'A good free practice game should offer unlimited rounds, accept only real words, show clear tile feedback, record your results and work without sign-up or installation. This game does all five, and adds a definition for every answer so you learn something even when you lose.',
         ],
       },
     ],
     faq: [
       {
+        q: 'What is Wordle practice?',
+        a: 'Wordle practice means playing extra Wordle-style rounds outside the daily puzzle so you can improve without waiting for the next day. Here every round uses a new random five-letter word and six guesses.',
+      },
+      {
+        q: 'Is Wordle practice free, and do I need an app or account?',
+        a: 'It is free, and there is no app to install and no account to create. The game runs in your web browser on desktop and mobile.',
+      },
+      {
+        q: 'How many Wordle practice games can I play?',
+        a: 'As many as you like. There is no daily limit; press New Word whenever you want another round.',
+      },
+      {
+        q: 'Is this the official daily Wordle?',
+        a: 'No. This is an independent practice game with its own word list. It is a way to warm up and test strategies without waiting for the next daily puzzle.',
+      },
+      {
+        q: "What is today's Wordle answer, and can I get a hint?",
+        a: 'This site does not publish the daily Wordle answer. Practice words are random and unrelated to the daily puzzle. If you need help with a daily puzzle, enter your clues into the Wordle Solver.',
+      },
+      {
+        q: 'Can I play past or archived Wordle puzzles?',
+        a: 'No. Practice words are random rather than taken from a calendar, so there is no archive of old puzzles. You get a different word every time you start a round.',
+      },
+      {
+        q: 'Can I play Wordle with friends online?',
+        a: 'Not in real time: the game is single-player. After a round you can copy a grid of colored squares with Share Grid and send it to a friend to compare scores.',
+      },
+      {
+        q: 'How can I improve my Wordle skills?',
+        a: 'Practice one starting word until you know how it performs, use your second guess to test five new letters, and review each lost round to see which guess could have narrowed the list further.',
+      },
+      {
+        q: 'What are the best words to start Wordle with?',
+        a: 'Words that combine common letters, such as CRANE, SLATE and ADIEU, are popular. Open the Best Wordle Starting Words list for more and for how they compare.',
+      },
+      {
+        q: 'What are the five magic words for Wordle?',
+        a: `There is no official set. A famous puzzle found five words that together use 25 different letters: FJORD, GUCKS, NYMPH, VIBEX and WALTZ. It is a curiosity rather than a strategy, because it spends five guesses on unlikely answers and leaves you only one try, and ${WP.notAccepted}. Adapting each guess to the clues works better.`,
+      },
+      {
+        q: 'Is there a hard mode in this Wordle practice game?',
+        a: 'There is no hard-mode switch, but you can play by its rules yourself by reusing every green and yellow letter you have found in each following guess.',
+      },
+      {
         q: 'Are practice words repeated?',
         a: 'Words are picked at random, so a repeat is possible but rare in a short session. Statistics only count completed games.',
       },
       {
-        q: 'Do I need an account or an app?',
-        a: 'No. The game runs in your browser, is free, and keeps your streak on your own device.',
+        q: 'What is the best free Wordle game for practice?',
+        a: 'Look for a game that is unlimited, checks guesses against a real word list, shows clear tile feedback, tracks your results and needs no sign-up. This practice game offers all of these and shows a definition for each answer.',
       },
     ],
   },

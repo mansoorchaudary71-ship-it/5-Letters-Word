@@ -245,12 +245,13 @@ const BASE_ROUTES: RouteInfo[] = [
     tab: 'game',
     kind: 'tool',
     filter: {},
-    title: 'Wordle Practice: Play Unlimited 5-Letter Word Games',
+    title: 'Wordle Practice: Free Unlimited Wordle Games Online',
     description:
-      'Practise Wordle with unlimited random 5-letter words. Free word game with green, yellow and grey feedback and no sign-up.',
-    h1: 'Wordle Practice: Unlimited 5-Letter Word Game',
+      'Wordle practice with free, unlimited games online. Random 5-letter words, green, yellow and grey tile feedback and streak stats. No app or sign-up.',
+    h1: 'Wordle Practice: Free Unlimited Wordle Game',
     about: [
-      'Guess the hidden five-letter word in six tries. After each guess the tiles turn green, yellow or grey to show how close you are. Play as many rounds as you like to build your Wordle strategy.',
+      "Wordle practice means playing extra Wordle-style rounds outside the daily puzzle, so you can build your skills without waiting for tomorrow's word. This free practice game gives you a new random five-letter word every round, six guesses and instant green, yellow and grey tile feedback, with no limit on how many games you play.",
+      'Press New Word whenever you want another round. The game runs in your browser on desktop and mobile, needs no account or app, and keeps your win rate and streak on your own device. After each round you can read the answer\'s definition.',
     ],
     sections: [
       {
@@ -262,12 +263,7 @@ const BASE_ROUTES: RouteInfo[] = [
         ],
       },
     ],
-    faq: [
-      {
-        q: 'Is this the official daily Wordle?',
-        a: 'No. This is an independent practice game with its own word list. It is a way to warm up and test strategies without waiting for the next daily puzzle.',
-      },
-    ],
+    faq: [],
   },
   {
     path: TAB_PATHS.stats,
