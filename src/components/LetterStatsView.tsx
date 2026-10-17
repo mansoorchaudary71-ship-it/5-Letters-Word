@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { computeOverallFrequencies, computePositionalFrequencies } from '../data/letterStats';
+import { ENGLISH_LETTER_FREQUENCY, computeOverallFrequencies, computePositionalFrequencies } from '../data/letterStats';
 import { BarChart3, TrendingUp, Lightbulb } from './ui/Icons';
 
-export const LetterStatsView: React.FC = () => {
+export const LetterStatsView: React.FC<{ heading?: string }> = ({ heading = 'Letter Frequency Chart for English and 5-Letter Words' }) => {
   const overallFreqs = useMemo(() => computeOverallFrequencies(), []);
   const positionalFreqs = useMemo(() => computePositionalFrequencies(), []);
   const [activePos, setActivePos] = useState<number>(0);
@@ -17,6 +17,7 @@ export const LetterStatsView: React.FC = () => {
   ];
 
   const maxOverall = overallFreqs[0]?.count || 1;
+  const maxEnglish = ENGLISH_LETTER_FREQUENCY[0]?.percentage || 1;
 
   return (
     <div className="space-y-8">
@@ -24,10 +25,10 @@ export const LetterStatsView: React.FC = () => {
       <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card">
         <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
           <BarChart3 className="w-6 h-6 text-ink" />
-          Letter Frequency in 5-Letter Words
+          {heading}
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Strategic letter distribution analytics across 5-letter words to supercharge your Wordle and Scrabble game.
+          Letter frequency counts and percentages for the English alphabet and for 5-letter words, with a position-by-position Wordle heatmap to help you choose better guesses.
         </p>
       </div>
 
@@ -35,7 +36,7 @@ export const LetterStatsView: React.FC = () => {
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-ink" />
-          Best Statistically Proven Wordle Starters
+          Best Wordle Starting Words by Letter Frequency
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -60,10 +61,10 @@ export const LetterStatsView: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-slate-900">
-              Position-by-Position Letter Frequency
+              Wordle Letter Frequency by Position
             </h2>
             <p className="text-xs text-slate-500">
-              Select a position slot (1 to 5) to see which letters appear most commonly.
+              Select a position slot (1 to 5) to see which letters are most common in that position of a 5-letter word.
             </p>
           </div>
 
@@ -113,7 +114,7 @@ export const LetterStatsView: React.FC = () => {
       {/* Overall Letter Frequency Chart */}
       <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
         <h2 className="text-lg font-semibold text-slate-900">
-          Overall Letter Frequency in 5-Letter English Words
+          Letter Frequency Chart for 5-Letter Words (All Positions)
         </h2>
 
         <div className="space-y-2">
@@ -139,6 +140,48 @@ export const LetterStatsView: React.FC = () => {
                   />
                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-600">
                     {item.percentage}% ({item.count})
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* English (running text) Letter Frequency Chart */}
+      <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">
+            English Letter Frequency Chart (Normal Text, A to Z)
+          </h2>
+          <p className="text-xs text-slate-500">
+            Share of all letters in ordinary English prose, ranked from most to least common (Lewand). Compare it with the 5-letter chart above.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          {ENGLISH_LETTER_FREQUENCY.map((item, idx) => {
+            const barWidth = `${Math.max(4, Math.round((item.percentage / maxEnglish) * 100))}%`;
+            const isVowel = 'AEIOU'.includes(item.letter);
+
+            return (
+              <div key={item.letter} className="flex items-center gap-3 text-xs">
+                <div className="w-8 flex items-center gap-1">
+                  <span className="text-[10px] font-semibold text-slate-400 w-3">{idx + 1}</span>
+                  <span className={`font-semibold text-sm ${isVowel ? 'text-amber-700' : 'text-slate-900'}`}>
+                    {item.letter}
+                  </span>
+                </div>
+
+                <div className="grow bg-slate-100 h-5 rounded-md overflow-hidden relative">
+                  <div
+                    className={`h-full rounded-md transition-all ${
+                      isVowel ? 'bg-near' : 'bg-brand'
+                    }`}
+                    style={{ width: barWidth }}
+                  />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-600">
+                    {item.percentage.toFixed(2)}%
                   </span>
                 </div>
               </div>

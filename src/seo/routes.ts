@@ -23,9 +23,14 @@ export interface Link {
   label: string;
   path: string;
 }
+export interface Subsection {
+  heading: string; // rendered as an <h3> under the section's <h2>
+  body: string[];
+}
 export interface Section {
   heading: string;
   body?: string[];
+  subsections?: Subsection[];
   links?: Link[];
 }
 export type RouteKind = 'home' | 'tool' | 'list' | 'guide' | 'page' | 'word';
@@ -269,12 +274,13 @@ const BASE_ROUTES: RouteInfo[] = [
     tab: 'stats',
     kind: 'tool',
     filter: {},
-    title: '5-Letter Word Letter Frequency Chart & Heatmap',
+    title: 'Letter Frequency Chart: English & 5-Letter Words',
     description:
-      'See which letters are most common in 5-letter words and in each position. Letter frequency heatmap to choose better Wordle guesses.',
-    h1: 'Letter Frequency in 5-Letter Words',
+      'Letter frequency chart for English and for 5-letter words: ranked letters, percentages and a heatmap for each position. Free, instant, no sign-up.',
+    h1: 'Letter Frequency Chart for English and 5-Letter Words',
     about: [
-      'These charts show how often each letter appears in five-letter words and how often it appears in each of the five positions. Use them to pick starting words that test the most likely letters.',
+      'Letter frequency is how often each letter of the alphabet appears in a text or a word list. This page gives you a letter frequency chart for ordinary English, plus a complete letter frequency analysis of five-letter words, ranked from the most to the least common letter, with a separate heatmap for each of the five positions.',
+      'Use the English table to see which letters dominate normal writing, and the 5-letter charts to choose better Wordle guesses: the position heatmap shows which letter is most likely in slot 1, 2, 3, 4 or 5, and the overall chart shows which letters are worth testing first.',
     ],
     sections: [
       {

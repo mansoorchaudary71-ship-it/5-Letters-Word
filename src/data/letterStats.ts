@@ -33,6 +33,20 @@ export function computeOverallFrequencies(): LetterFrequency[] {
     .sort((a, b) => b.count - a.count);
 }
 
+// Letter frequency in ordinary English prose, as a percentage of all letters.
+// Source: Robert Lewand, "Cryptological Mathematics" (2000), the figures most often cited for English text.
+// This is general English (running text), NOT five-letter words; the five-letter statistics above are computed from the word list.
+const ENGLISH_PERCENTAGES: Record<string, number> = {
+  A: 8.17, B: 1.49, C: 2.78, D: 4.25, E: 12.7, F: 2.23, G: 2.02, H: 6.09, I: 6.97,
+  J: 0.15, K: 0.77, L: 4.03, M: 2.41, N: 6.75, O: 7.51, P: 1.93, Q: 0.1, R: 5.99,
+  S: 6.33, T: 9.06, U: 2.76, V: 0.98, W: 2.36, X: 0.15, Y: 1.97, Z: 0.07,
+};
+
+/** English letters ranked from most to least common (E, T, A, O, I, N, S, H, R, D ...). */
+export const ENGLISH_LETTER_FREQUENCY: { letter: string; percentage: number }[] = Object.entries(ENGLISH_PERCENTAGES)
+  .map(([letter, percentage]) => ({ letter, percentage }))
+  .sort((a, b) => b.percentage - a.percentage);
+
 // Position frequency (slot 1 to 5)
 export function computePositionalFrequencies(): Record<number, LetterFrequency[]> {
   const result: Record<number, LetterFrequency[]> = {

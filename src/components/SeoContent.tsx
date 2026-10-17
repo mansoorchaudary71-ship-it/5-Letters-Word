@@ -78,6 +78,14 @@ export const SeoContent: React.FC<SeoContentProps> = ({ route, onNavigate, varia
           {(s.body ?? []).map((p, i) => (
             <p key={i}>{p}</p>
           ))}
+          {(s.subsections ?? []).map((sub) => (
+            <div key={sub.heading} className="space-y-2 pt-2">
+              <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">{sub.heading}</h3>
+              {sub.body.map((p, i) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          ))}
           {s.links && <LinkList links={s.links} onNavigate={onNavigate} />}
         </div>
       ))}

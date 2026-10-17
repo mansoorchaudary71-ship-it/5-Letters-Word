@@ -187,7 +187,7 @@ export default function App() {
 
           {activeTab === 'game' && <WordleGame onSelectWord={setSelectedWord} />}
 
-          {activeTab === 'stats' && <LetterStatsView />}
+          {activeTab === 'stats' && <LetterStatsView heading={route.h1} />}
         </Suspense>
 
         {activeTab === 'word' && route.wordSlug && (

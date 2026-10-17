@@ -306,7 +306,8 @@ const a = (l: Link) => `<a href="${href(l.path)}">${esc(l.label)}</a>`;
 const ul = (links: Link[]) => `<ul style="display:flex;flex-wrap:wrap;gap:8px 16px;list-style:none;padding:0">${links.map((l) => `<li>${a(l)}</li>`).join('')}</ul>`;
 
 function sectionHtml(s: Section): string {
-  return `<h2>${esc(s.heading)}</h2>${(s.body ?? []).map((p) => `<p>${esc(p)}</p>`).join('')}${s.links ? ul(s.links) : ''}`;
+  const subs = (s.subsections ?? []).map((t) => `<h3>${esc(t.heading)}</h3>${t.body.map((p) => `<p>${esc(p)}</p>`).join('')}`).join('');
+  return `<h2>${esc(s.heading)}</h2>${(s.body ?? []).map((p) => `<p>${esc(p)}</p>`).join('')}${subs}${s.links ? ul(s.links) : ''}`;
 }
 
 function wordList(route: RouteInfo): string {
