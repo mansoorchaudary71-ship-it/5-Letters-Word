@@ -121,8 +121,8 @@ export const Hero: React.FC<HeroProps> = ({ heading, onNavigate, onSelectWord })
         </h1>
 
         <p className="mt-5 mx-auto max-w-2xl text-balance text-base sm:text-lg leading-relaxed text-slate-500">
-          Search, solve and unscramble every five-letter word. Filter by pattern, vowels and Scrabble score, then open
-          any word for its definition.
+          Search 5 letter words by starting letter, ending letter, included letters or pattern. Open any word for its
+          definition and Scrabble score.
         </p>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-up [animation-delay:180ms]">

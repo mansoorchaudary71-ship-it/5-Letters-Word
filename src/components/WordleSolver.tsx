@@ -8,9 +8,11 @@ import { copyText } from '../lib/clipboard';
 
 interface WordleSolverProps {
   onSelectWord: (word: WordEntry) => void;
+  /** Page <h1>; comes from the route so the visible H1 matches the SEO title. */
+  heading?: string;
 }
 
-export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
+export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord, heading = 'Wordle Solver & Wordle Helper' }) => {
   // Green letters: exact position (index 0 to 4)
   const [greens, setGreens] = useState<string[]>(['', '', '', '', '']);
 
@@ -139,7 +141,7 @@ export const WordleSolver: React.FC<WordleSolverProps> = ({ onSelectWord }) => {
           <div>
             <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-brand" />
-              Wordle Solver &amp; Helper
+              {heading}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
               Enter known Green (correct position), Yellow (present letters), and Gray (absent) clues to instantly uncover remaining solutions.

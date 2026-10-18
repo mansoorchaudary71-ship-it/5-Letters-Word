@@ -30,7 +30,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
   initialEndsWith = '',
   initialTag = 'all',
   initialContains = '',
-  heading = '5-Letter Word Finder',
+  heading = '5 Letter Word Finder',
   asSubheading = false,
 }) => {
   const [filters, setFilters] = useState<FilterState>({
@@ -269,7 +269,7 @@ export const WordFinder: React.FC<WordFinderProps> = ({
                   : 'text-3xl sm:text-4xl font-semibold tracking-[-0.04em] text-ink text-balance'
               }
             >
-              {asSubheading ? 'Search every five-letter word' : heading}
+              {asSubheading ? 'Search 5 letter words by pattern, start, end or letters' : heading}
             </Heading>
             <p className="mt-2 text-sm text-slate-500 leading-relaxed">
               Filter by starting or ending letters, exact positions, vowels and Scrabble value.

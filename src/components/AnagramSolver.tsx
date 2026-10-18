@@ -7,6 +7,8 @@ import { copyText } from '../lib/clipboard';
 
 interface AnagramSolverProps {
   onSelectWord: (word: WordEntry) => void;
+  /** Page <h1>; comes from the route so the visible H1 matches the SEO title. */
+  heading?: string;
 }
 
 const PAGE_SIZE = 96;
@@ -30,7 +32,7 @@ const getIndex = (): IndexedWord[] => {
   return WORD_INDEX;
 };
 
-export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) => {
+export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord, heading = 'Anagram Solver & Word Unscrambler for 5 Letter Words' }) => {
   const [lettersInput, setLettersInput] = useState<string>('EARTH');
   const [allowSubAnagrams, setAllowSubAnagrams] = useState<boolean>(false);
   const [copiedWord, setCopiedWord] = useState<string | null>(null);
@@ -88,10 +90,10 @@ export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord }) =>
         <div>
           <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
             <Shuffle className="w-6 h-6 text-ink" />
-            5-Letter Anagram Solver &amp; Word Unscrambler
+            {heading}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Unscramble any letters to discover all valid 5-letter anagrams. Use <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded font-mono font-bold">?</code> for wildcards.
+            Unscramble your letters into valid 5 letter words. Enter five letters, or a longer rack, and use <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded font-mono font-bold">?</code> for a blank tile.
           </p>
         </div>
 

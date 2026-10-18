@@ -2,7 +2,7 @@
 // Pure TypeScript (no DOM / Vite APIs) so the build script and the React app can both import it.
 
 import { ALL_WORDS } from '../data/words';
-import { SITE_NAME, SITE_TAGLINE } from './site';
+import { SITE_NAME } from './site';
 import { TOOL_CONTENT } from './toolContent';
 import { DEFINED_WORDS, clip, describeList, describeWord, hasWordPage, wordPath, wordsForFilter } from './content';
 import { GUIDE_ROUTES, STATIC_ROUTES } from './pages';
@@ -55,6 +55,15 @@ export interface RouteInfo {
 export const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 export const MIN_WORDS = 10; // list pages with fewer words would be thin content, so they are not created at all
 
+// Numbers quoted in the home-page copy are computed from the dictionary so the text cannot drift from the data.
+const N_WORDS = ALL_WORDS.length.toLocaleString('en-US');
+const withLetter = (L: string) => {
+  const n = ALL_WORDS.filter((w) => w.word.includes(L)).length;
+  return { n: n.toLocaleString('en-US'), pct: Math.round((n / ALL_WORDS.length) * 100) };
+};
+const S_SHARE = withLetter('S');
+const E_SHARE = withLetter('E');
+
 const TAB_PATHS: Record<Exclude<Tab, 'article' | 'word'>, string> = {
   finder: '/',
   solver: '/wordle-solver/',
@@ -85,20 +94,68 @@ const containsPath = (v: string) => `/5-letter-words-containing-${v.toLowerCase(
 
 const FAQ_FINDER: Faq[] = [
   {
-    q: 'How do I find a 5-letter word when I only know some letters?',
-    a: 'Type the letters you know into the pattern boxes and leave the unknown positions empty. For example S _ _ R T finds words such as SHORT, SMART and SPORT. Add letters that must be included or excluded to narrow the list further.',
+    q: 'How do I find a 5 letter word when I only know some of the letters?',
+    a: 'Type the letters you know into the pattern boxes, one per position, and leave the unknown positions empty. For example S _ _ R T returns SHIRT, SHORT, SMART and SPORT. If you know letters but not their positions, add them to the "must contain" box, or use the Anagram Solver when you hold all five letters.',
   },
   {
-    q: 'Can I use this site to help solve Wordle?',
-    a: 'Yes. Use the Wordle Solver to enter your green, yellow and grey letters after each guess and get the remaining possible answers, or use the Word Finder to browse words by starting letter, ending letter or pattern.',
+    q: 'What 5 letter words contain the letters A and O (or any two letters)?',
+    a: 'Type both letters into the "must contain" box. A and O together return ABBOT, ABODE, ABORT, ABOUT and ACORN among others. Add letters to the exclude box to rule out the ones your clues have eliminated.',
+  },
+  {
+    q: 'What 5 letter words have A in the third place?',
+    a: 'Put A in the third pattern box and leave the rest empty. That returns ABACK, ABASE, ADAPT, AGAIN and many more, and you can add a starting or ending letter to narrow the list.',
+  },
+  {
+    q: 'Which 5 letter words contain only the vowel E and the letter L?',
+    a: 'Put L and E in the "must contain" box and A, I, O and U in the exclude box. That returns words such as BELCH, BLEND, CLEFT, SHELL and SPELL.',
+  },
+  {
+    q: 'What are some good 5 letter words for Wordle, and which one should I start with?',
+    a: 'A strong first guess covers several of the most frequent letters in different positions. AROSE, RAISE, STARE, SLATE and CRANE balance vowels with common consonants, while ADIEU and AUDIO test four vowels at once. The Best Wordle Starting Words page ranks them, and the Wordle Solver filters the full list from your green, yellow and grey tiles.',
+  },
+  {
+    q: "What is today's 5 letter word?",
+    a: 'This site does not publish daily puzzle answers. Enter the clues from your own guesses into the Wordle Solver to see which words are still possible, or rehearse with the unlimited practice game so the daily puzzle stays a surprise.',
+  },
+  {
+    q: 'How many possible Wordle words are there?',
+    a: 'The original Wordle shipped with 2,315 possible answers and accepted roughly 13,000 five-letter words as valid guesses in total. The New York Times has edited both lists since, so exact figures change over time.',
+  },
+  {
+    q: 'What 5 letter words start with A, or start with A and end with E?',
+    a: 'Words starting with A include ABOUT, ACTOR, ADORE and AFTER. Words that start with A and end with E include ABOVE, ALONE, ARISE, AWAKE and AZURE. Put the letters in the first and last pattern boxes, or open the starting-with-A list for every match.',
+  },
+  {
+    q: 'Which 5 letter word has the most vowels?',
+    a: 'ADIEU, AUDIO, AERIE, EERIE and QUEUE each contain four vowels. No five-letter word in this dictionary contains all five vowels.',
+  },
+  {
+    q: 'Is there a 5 letter word without vowels?',
+    a: 'Yes, if Y does not count as a vowel. CRYPT, GLYPH, LYMPH, NYMPH, MYRRH, PSYCH and TRYST have no A, E, I, O or U, and CRWTH gets by with W instead of Y.',
+  },
+  {
+    q: 'Which 5 letter word becomes shorter when you add two letters?',
+    a: 'SHORT. Add the two letters ER and you get SHORTER, a word that now means "more short". It is a classic riddle that plays on the word itself.',
+  },
+  {
+    q: 'What are some random 5 letter words?',
+    a: 'Press New Word in the Wordle practice game for an endless supply of random five-letter words, or open the A-Z directory and pick any letter to scan its list.',
+  },
+  {
+    q: 'Is there a list of all 5 letter words?',
+    a: 'Yes. The A-Z directory lists every word in the dictionary by first letter, and each starting-letter, ending-letter and containing-letter page lists its matching words with Scrabble scores.',
+  },
+  {
+    q: 'What are some free 5 letter word games?',
+    a: 'Wordle is the best known. On this site you can play unlimited free Wordle-style rounds in the practice game, use the Wordle Solver to check your logic, or unscramble tiles with the Anagram Solver for Scrabble-style play.',
   },
   {
     q: 'Are all of these words valid in Scrabble?',
-    a: 'The list is built for word games and every entry shows its Scrabble and Words With Friends tile score. Official dictionaries differ between tournaments and countries, so check your own rulebook before relying on a word in competition.',
+    a: 'Every entry shows its Scrabble and Words With Friends tile score, but official dictionaries differ between tournaments and countries. Check your own rulebook before relying on a word in competition.',
   },
   {
     q: 'Do the words have definitions?',
-    a: 'Yes. Familiar words have a written definition, part of speech and example sentence, and each of those words has its own page. Rarer game words are listed with their scores.',
+    a: 'Familiar words have a written definition, part of speech and example sentence, and each of those words has its own page. Rarer game words are listed with their scores.',
   },
 ];
 
@@ -115,25 +172,204 @@ const BASE_ROUTES: RouteInfo[] = [
     tab: 'finder',
     kind: 'home',
     filter: {},
-    title: `${SITE_NAME}: ${SITE_TAGLINE}`,
-    description: `Find 5-letter words by pattern, starting or ending letters, or included letters. Free Wordle solver, anagram unscrambler, definitions and Scrabble scores.`,
-    h1: '5-Letter Word Finder',
+    title: '5 Letter Word Finder: Search by Start, End & Letters',
+    description:
+      'Free 5 letter word finder. Search by starting letter, ending letter, letters it contains or vowels, with definitions and Scrabble scores for every word.',
+    h1: '5 Letter Word Finder',
     about: [
-      'This free 5-letter word finder helps you search a dictionary of five-letter English words by starting letter, ending letter, a letter pattern such as S _ _ R T, letters that must appear and letters to leave out. Every familiar word comes with a short definition, its part of speech and its Scrabble and Words With Friends score.',
-      'Stuck on a puzzle? Use the Wordle Solver to narrow down answers from your clues, the Anagram Solver to unscramble five letters, or browse the A-Z directory to explore words by letter.',
+      `Need a 5 letter word? This free 5 letter word finder searches ${N_WORDS} five-letter English words by starting letter, ending letter, letters the word contains, letters to leave out, vowel count or an exact pattern such as S _ _ R T. Familiar words come with a short definition, part of speech and Scrabble and Words With Friends score.`,
+      'Whether you are stuck on a Wordle guess, unscrambling a Scrabble rack or filling a crossword, start with the finder below. The Wordle Solver, Anagram Solver and A-Z directory cover the other ways people search for 5 letter words.',
     ],
     sections: [
       {
-        heading: 'How to use the 5-letter word finder',
+        heading: 'How to find a 5 letter word from the letters you know',
         body: [
-          'Start with the letters you are sure about. Type known letters into the pattern boxes in their exact positions, then add letters that must appear somewhere (yellow tiles in Wordle) and letters that must not appear (grey tiles). The list updates as you type, so you can see how each clue narrows the answer.',
-          'Use the starting and ending letter boxes for crossword clues, sort by Scrabble score when you want the best play, and open any word to read its definition and see its anagrams.',
+          'Start with whatever you are sure about. The finder updates as you type, so you can watch each clue narrow the list. Which boxes you use depends on what you know about the word.',
+        ],
+        subsections: [
+          {
+            heading: 'Search by exact pattern (letters in known positions)',
+            body: [
+              'Type each known letter into its own position box and leave the rest empty. S _ _ R T finds SHIRT, SHORT, SMART, SPORT and START. The same method answers "5 letter word with A in the middle" (put A in the third box: CRANE, PLANT, SHARK), "5 letter word with I in the middle" (ABIDE, AGILE, ADIEU) or "second letter is A" (put it in the second box).',
+            ],
+          },
+          {
+            heading: 'Find words from a few starting or ending letters',
+            body: [
+              'Partial clues work too. Typing ELE as the start returns ELECT and ELEGY, RIT returns RITES, an ending of OPSE returns COPSE, an ending of ETA returns THETA and a USUR start returns USURP and USURY. A fragment inside the word works the same way: PEE finds SPEED and TEPEE, and SUR finds SURGE and SURLY. Searches like these are common when you have a handful of letters from a crossword or a word puzzle.',
+            ],
+          },
+          {
+            heading: 'Unscramble letters you have (5 letter word unscrambler)',
+            body: [
+              'If you hold the letters but not their order, as in "what 5 letter word can I make with these letters", use the Anagram Solver. It accepts a question mark or asterisk as a blank tile and lists every five-letter word those tiles can form.',
+            ],
+          },
+          {
+            heading: 'Looking for a 5 letter word with a certain meaning?',
+            body: [
+              'For a clue such as a word meaning courage or happy, enter the letters you already have from crossing answers, then scan the results. Open any word with a definition to check its meaning, part of speech and example sentence before you commit to it.',
+            ],
+          },
+        ],
+        links: [{ label: 'Anagram Solver', path: '/anagram-solver/' }],
+      },
+      {
+        heading: '5 letter words by starting letter',
+        body: [
+          '"Starts with", "begins with" and "starting with" all describe the same filter: put the first letter in the starting-letter box. Sorting by Scrabble score or commonness puts the most useful words first.',
+        ],
+        subsections: [
+          {
+            heading: '5 letter words starting with a single letter (A to Z)',
+            body: [
+              'Every letter has its own list page. S is the most common first letter in this dictionary, followed by C, P, T, F and B. Examples starting with A include ABOUT, ACTOR, ADORE and AFTER.',
+            ],
+          },
+          {
+            heading: '5 letter words starting with two letters (ST, CH, TR and more)',
+            body: [
+              'Opening letter pairs such as ST, CH, SH, TH, BR and TR are useful when you only remember how a word begins. STR also narrows quickly, returning STRAP, STRAW, STRAY, STRIP, STRUM and STRUT among others.',
+            ],
+          },
+          {
+            heading: '5 letter words that start with one letter and end with another',
+            body: [
+              'Fill the first and last boxes together. Starting with A and ending in E gives ABOVE, ALONE, ARISE, AWAKE and AZURE. Add a third known letter, such as A in the third position, and the list shrinks to ten words.',
+            ],
+          },
+        ],
+        links: [
+          { label: '5-letter words starting with A', path: '/5-letter-words-starting-with-a/' },
+          { label: '5-letter words starting with S', path: '/5-letter-words-starting-with-s/' },
+        ],
+      },
+      {
+        heading: '5 letter words by ending letter',
+        body: [
+          'Use the ending-letter box for "ends with", "ending in" and "ends in" searches. These are popular for crossword fill and for rhyming. S is by far the most common last letter in this dictionary because of plurals, followed by E, Y, D, R and T.',
+        ],
+        subsections: [
+          {
+            heading: '5 letter words ending in E, Y, T and other single letters',
+            body: [
+              'Every ending letter has a list page. Words ending in E include ABOVE, ALONE and ARISE, and words ending in Y include DRYLY, PROXY and PYGMY.',
+            ],
+          },
+          {
+            heading: '5 letter words ending in ER, ED, LY and other letter groups',
+            body: [
+              'Common suffixes such as ER, ED, LY, ES and ST have their own pages, and you can type any ending of up to five letters into the ending box to search your own.',
+            ],
+          },
+        ],
+        links: [
+          { label: '5-letter words ending with E', path: '/5-letter-words-ending-with-e/' },
+          { label: '5-letter words ending with ER', path: '/5-letter-words-ending-with-er/' },
+        ],
+      },
+      {
+        heading: '5 letter words containing specific letters',
+        body: [
+          'Letters in the "must contain" box can appear in any position, which matches the yellow tiles in Wordle. Letters in the exclude box must be absent, which matches grey tiles.',
+        ],
+        subsections: [
+          {
+            heading: '5 letter words with a single letter (the letter S, E, A and so on)',
+            body: [
+              `Searches such as "5 letter word with the letter S" are answered by typing that letter into the "must contain" box. In this dictionary S appears in ${S_SHARE.n} words (${S_SHARE.pct}%) and E in ${E_SHARE.n} (${E_SHARE.pct}%), which is why they are the two most useful letters to test first. Every letter has its own "containing" page too.`,
+            ],
+          },
+          {
+            heading: '5 letter words containing these letters (A and E, R and E, A and O)',
+            body: [
+              'Enter several letters in the must-contain box to find words that use all of them in any order, which also answers "5 letter words with these letters" and "using these letters". Containing A and O, for example, returns ABBOT, ABODE, ABORT, ABOUT, ACORN and many others. Add an excluded letter to remove the ones you have ruled out.',
+            ],
+          },
+          {
+            heading: '5 letter words without certain letters',
+            body: [
+              'Searches such as "5 letter word without A and E" are answered with the exclude box. List every letter that must not appear, and add a must-contain letter or two to keep the list short.',
+            ],
+          },
+          {
+            heading: '5 letter words with double letters',
+            body: [
+              'Words with a repeated letter, such as LLAMA, ABBEY or SPEED, are easy to overlook. The double-letters list gathers them in one place, and the Wordle strategy guide explains how repeated letters show up in your clues.',
+            ],
+          },
+        ],
+        links: [
+          { label: '5-letter words containing S', path: '/5-letter-words-containing-s/' },
+          { label: '5-letter words with double letters', path: '/5-letter-words-with-double-letters/' },
+        ],
+      },
+      {
+        heading: '5 letter words by number of vowels',
+        body: [
+          'The vowel filter limits results by how many of A, E, I, O and U a word has, which is the quickest way to answer most "most vowels" and "no vowels" questions.',
+        ],
+        subsections: [
+          {
+            heading: '5 letter words with the most vowels',
+            body: [
+              'ADIEU, AUDIO, AERIE, EERIE and QUEUE each have four vowels. No five-letter word in this dictionary has all five, so four is the maximum. ADIEU and AUDIO are popular Wordle openers because they test several vowels at once.',
+            ],
+          },
+          {
+            heading: '5 letter words with no vowels',
+            body: [
+              'When Y acts as the vowel, words such as CRYPT, GLYPH, LYMPH, NYMPH, MYRRH, PSYCH and TRYST contain none of A, E, I, O or U. CRWTH is rarer still and uses W. Words where Y is the only vowel are also handy when you need a vowel-light guess.',
+            ],
+          },
+        ],
+        links: [
+          { label: '5-letter words with no vowels', path: '/5-letter-words-with-no-vowels/' },
+          { label: '5-letter words with many vowels', path: '/5-letter-words-with-many-vowels/' },
+        ],
+      },
+      {
+        heading: '5 letter words for Wordle',
+        body: [
+          'Wordle is the main reason people search for 5 letter words today, and this finder is built to work alongside it.',
+        ],
+        subsections: [
+          {
+            heading: 'Best 5 letter words to start Wordle',
+            body: [
+              'A good opener uses common letters in different positions. AROSE, RAISE, STARE, SLATE and CRANE are widely used, and ADIEU tests four vowels in a single guess. The starting words page ranks them, and the letter frequency chart shows why they work.',
+            ],
+          },
+          {
+            heading: 'How many Wordle words are there?',
+            body: [
+              'The original game used 2,315 possible answers and accepted about 13,000 words as valid guesses. The New York Times has edited both lists since, so treat those as approximate. Not every valid guess can be an answer, which is why a solver is useful once you have a few clues.',
+            ],
+          },
+          {
+            heading: "Today's Wordle word",
+            body: [
+              'This site does not publish daily answers, so the puzzle is still yours to solve. Enter your green, yellow and grey clues into the Wordle Solver to see what remains possible, or practise in the free unlimited game.',
+            ],
+          },
+        ],
+        links: [
+          { label: 'Best Wordle starting words', path: '/best-wordle-starting-words/' },
+          { label: 'Wordle Solver', path: '/wordle-solver/' },
+          { label: 'Wordle practice game', path: '/wordle-practice/' },
+        ],
+      },
+      {
+        heading: '5 letter word finder, solver or unscrambler: which one do you need?',
+        body: [
+          'The three tools answer different questions. The word finder filters the whole list by position, start, end, contained letters and vowels, and is the right choice when you know some of the word. The Wordle Solver takes your guesses and tile colours and returns the words still possible. The Anagram Solver takes letters in any order, with blanks, and returns every word they can make.',
+          'For browsing instead of searching, the A-Z directory is a full list of 5 letter words by first letter, and the high-scoring Scrabble words page ranks them by tile score.',
         ],
       },
       {
         heading: 'Why five-letter words matter',
         body: [
-          'Five-letter words are the format of Wordle and many of its spin-offs, and they are among the most useful lengths in Scrabble because they reach bonus squares without needing a perfect rack. They are also common in crosswords and vocabulary exercises, which is why a dedicated reference is helpful.',
+          'Five letters is the length of Wordle and its many spin-offs, and one of the most useful lengths in Scrabble because such words reach bonus squares without needing a perfect rack. They are also common in crosswords and vocabulary exercises, which is why a dedicated reference helps.',
         ],
       },
       {
@@ -163,68 +399,56 @@ const BASE_ROUTES: RouteInfo[] = [
     tab: 'solver',
     kind: 'tool',
     filter: {},
-    title: 'Wordle Solver: Find Possible Answers From Your Clues',
+    title: 'Wordle Solver: Free Wordle Helper & Answer Finder',
     description:
-      'Enter your green, yellow and grey Wordle letters and see every remaining 5-letter answer, ranked by how likely it is. Free Wordle solver and helper.',
-    h1: 'Wordle Solver & Helper',
+      'Free Wordle solver: enter your green, yellow and grey letters to see the possible 5-letter answers plus the best next guesses. No download or sign-up.',
+    h1: 'Wordle Solver & Wordle Helper',
     about: [
-      'The Wordle Solver filters the word list using the feedback from your guesses. Mark each letter green when it is in the right place, yellow when it is in the word but in a different place, and grey when it is not in the word. The remaining candidates update instantly.',
-      'Tip: a good second guess uses common letters you have not tested yet, even if the word cannot be the answer. That removes the most possibilities for the next round.',
+      'This free Wordle solver turns your clues into a short list of possible answers. After each guess, enter the green letters (right letter, right spot), the yellow letters (in the word, wrong spot) and the grey letters (not in the word). The tool filters its dictionary of five-letter words instantly and suggests the best next guesses from the words that remain.',
+      'It runs in any browser on desktop or mobile, with no download, account or subscription, and the filtering happens on your own device. It is an independent helper for 5-letter Wordle, including the New York Times version, and is not affiliated with The New York Times.',
     ],
     sections: [
       {
-        heading: 'Related Wordle resources',
+        heading: 'Related Wordle tools and word lists',
         links: [
-          { label: 'Wordle strategy guide', path: '/guides/wordle-strategy/' },
           { label: 'Best Wordle starting words', path: '/best-wordle-starting-words/' },
+          { label: 'Wordle strategy guide', path: '/guides/wordle-strategy/' },
           { label: 'Wordle practice game', path: '/wordle-practice/' },
           { label: 'Letter frequency heatmap', path: '/letter-frequency/' },
+          { label: 'Word Finder', path: '/' },
+          { label: 'Anagram Solver', path: '/anagram-solver/' },
         ],
       },
     ],
-    faq: [
-      {
-        q: 'How does the Wordle solver work?',
-        a: 'It removes every word that conflicts with your clues: green letters must match their position, yellow letters must appear elsewhere in the word, and grey letters must not appear.',
-      },
-      {
-        q: 'What are the best Wordle starting words?',
-        a: 'Words that combine common letters such as A, E, R, S, T, O and L work well, for example CRANE, SLATE, ADIEU and AUDIO. Open the Best Wordle Starting Words list to see more.',
-      },
-    ],
+    // Body sections and the FAQ live in src/seo/toolContent.ts so the page copy is edited in one place.
+    faq: [],
   },
   {
     path: TAB_PATHS.anagram,
     tab: 'anagram',
     kind: 'tool',
     filter: {},
-    title: '5-Letter Anagram Solver: Unscramble Letters Into Words',
+    title: 'Anagram Solver: Unscramble Letters Into 5 Letter Words',
     description:
-      'Unscramble any five letters into valid 5-letter words. Free anagram solver for Scrabble, Wordle and word puzzles with definitions and scores.',
-    h1: '5-Letter Anagram Solver & Word Unscrambler',
+      'Free online anagram solver for 5 letter words. Unscramble letters with blanks or wildcards for Scrabble, Words With Friends and Wordle. No download.',
+    h1: 'Anagram Solver & Word Unscrambler for 5 Letter Words',
     about: [
-      'Type up to five letters and the anagram solver lists every five-letter word that can be made from them. It is useful for Scrabble racks, jumbled-word puzzles and checking whether your Wordle guess has other possible arrangements.',
+      'This free anagram solver rearranges the letters you type into valid five-letter English words. Enter exactly five letters for exact anagrams, add a question mark or asterisk for a blank tile, or enter a longer Scrabble rack to see every five-letter word it can make. Each result shows its definition and Scrabble score.',
+      'It is built for five-letter words only. That makes it fast and accurate for Scrabble and Words With Friends racks, Wordle checks, jumbled-word puzzles and crossword fill, but it does not solve multi-word phrases or names. The sections below explain exactly what it can and cannot do.',
     ],
     sections: [
       {
         heading: 'Related tools',
         links: [
           { label: 'Word Finder', path: '/' },
+          { label: 'Wordle Solver', path: '/wordle-solver/' },
           { label: 'Scrabble five-letter words guide', path: '/guides/scrabble-five-letter-words/' },
           { label: 'High-scoring Scrabble words', path: '/high-scoring-5-letter-scrabble-words/' },
         ],
       },
     ],
-    faq: [
-      {
-        q: 'What is an anagram?',
-        a: 'An anagram is a word made by rearranging the letters of another word, for example STONE, NOTES and ONSET all use the same five letters.',
-      },
-      {
-        q: 'Can I unscramble fewer than five letters?',
-        a: 'This solver is built for five-letter words, so it works best with exactly five letters. Use the Word Finder "contains" filter when you only know some of them.',
-      },
-    ],
+    // Body sections and the FAQ live in src/seo/toolContent.ts.
+    faq: [],
   },
   {
     path: TAB_PATHS.browse,
@@ -572,7 +796,8 @@ for (const r of CORE_ROUTES) {
   const extra = TOOL_CONTENT[r.path];
   if (!extra) continue;
   r.sections = [...(extra.sections ?? []), ...(r.sections ?? [])];
-  r.faq = [...r.faq, ...(extra.faq ?? [])];
+  if (extra.replaceAbout) r.about = extra.replaceAbout;
+  r.faq = extra.replaceFaq ? (extra.faq ?? []) : [...r.faq, ...(extra.faq ?? [])];
 }
 
 // Neighbour links ("words starting with the next letter") are built before we know which list pages exist, so drop any that do not.

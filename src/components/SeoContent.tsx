@@ -65,7 +65,7 @@ export const SeoContent: React.FC<SeoContentProps> = ({ route, onNavigate, varia
       {isArticle ? (
         <h1 className="text-4xl sm:text-5xl font-semibold text-ink tracking-[-0.04em] text-balance">{route.h1}</h1>
       ) : (
-        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-ink">{route.tab === 'word' ? `About the word ${route.wordSlug}` : `About ${route.h1}`}</h2>
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] text-ink">{route.tab === 'word' ? `About the word ${route.wordSlug}` : route.kind === 'home' ? 'About 5 letter words' : `About ${route.h1}`}</h2>
       )}
       {route.published && <p className="text-xs text-slate-400">Published {route.published}</p>}
       {route.about.map((p, i) => (

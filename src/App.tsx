@@ -177,9 +177,9 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'solver' && <WordleSolver onSelectWord={setSelectedWord} />}
+          {activeTab === 'solver' && <WordleSolver onSelectWord={setSelectedWord} heading={route.h1} />}
 
-          {activeTab === 'anagram' && <AnagramSolver onSelectWord={setSelectedWord} />}
+          {activeTab === 'anagram' && <AnagramSolver onSelectWord={setSelectedWord} heading={route.h1} />}
 
           {activeTab === 'browse' && (
             <BrowseDirectory onSelectWord={setSelectedWord} onNavigateToFinderWithFilter={handleNavigateToFinderWithFilter} />
