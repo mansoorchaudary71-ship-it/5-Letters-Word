@@ -1,0 +1,230 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { CardBlobs } from './ui/Blobs';
+import { WordEntry } from '../types/word';
+import { ALL_WORDS } from '../data/words';
+import { Shuffle, HelpCircle, ChevronRight, Copy, Check } from './ui/Icons';
+import { copyText } from '../lib/clipboard';
+
+interface AnagramSolverProps {
+  onSelectWord: (word: WordEntry) => void;
+  /** Page <h1>; comes from the route so the visible H1 matches the SEO title. */
+  heading?: string;
+}
+
+const PAGE_SIZE = 96;
+
+interface IndexedWord {
+  entry: WordEntry;
+  counts: number[]; // letter counts A-Z
+  key: string; // letters sorted, for exact-anagram checks
+}
+
+// Letter counts are computed once for the whole dictionary instead of on every keystroke.
+let WORD_INDEX: IndexedWord[] | null = null;
+const getIndex = (): IndexedWord[] => {
+  if (!WORD_INDEX) {
+    WORD_INDEX = ALL_WORDS.map((entry) => {
+      const counts = new Array<number>(26).fill(0);
+      for (let i = 0; i < entry.word.length; i++) counts[entry.word.charCodeAt(i) - 65]++;
+      return { entry, counts, key: entry.word.split('').sort().join('') };
+    });
+  }
+  return WORD_INDEX;
+};
+
+export const AnagramSolver: React.FC<AnagramSolverProps> = ({ onSelectWord, heading = 'Anagram Solver & Word Unscrambler for 5 Letter Words' }) => {
+  const [lettersInput, setLettersInput] = useState<string>('EARTH');
+  const [allowSubAnagrams, setAllowSubAnagrams] = useState<boolean>(false);
+  const [copiedWord, setCopiedWord] = useState<string | null>(null);
+  const [limit, setLimit] = useState(PAGE_SIZE);
+
+  // Quick preset letter racks
+  const presets = ['EARTH', 'CRANE', 'STARE', 'PLANT', 'LIGHT', 'AUDIO', 'STONE', 'DREAM'];
+
+  const results = useMemo(() => {
+    const raw = lettersInput.toUpperCase().replace(/[^A-Z\?\*]/g, '');
+    if (!raw) return [];
+
+    const wildcardsCount = (raw.match(/[\?\*]/g) || []).length;
+    const cleanLetters = raw.replace(/[\?\*]/g, '');
+
+    const inputCounts = new Array<number>(26).fill(0);
+    for (let i = 0; i < cleanLetters.length; i++) inputCounts[cleanLetters.charCodeAt(i) - 65]++;
+
+    // Strict exact anagram (no wildcards, no partial matches): compare sorted letters
+    const exactKey = !allowSubAnagrams && wildcardsCount === 0 && cleanLetters.length === 5 ? cleanLetters.split('').sort().join('') : null;
+
+    const found: WordEntry[] = [];
+    for (const { entry, counts, key } of getIndex()) {
+      if (exactKey !== null) {
+        if (key === exactKey) found.push(entry);
+        continue;
+      }
+      let neededWildcards = 0;
+      for (let i = 0; i < 26; i++) {
+        const missing = counts[i] - inputCounts[i];
+        if (missing > 0) neededWildcards += missing;
+      }
+      if (neededWildcards <= wildcardsCount) found.push(entry);
+    }
+    return found.sort((a, b) => b.scrabbleScore - a.scrabbleScore);
+  }, [lettersInput, allowSubAnagrams]);
+
+  // A new search starts back at the first page
+  useEffect(() => {
+    setLimit(PAGE_SIZE);
+  }, [lettersInput, allowSubAnagrams]);
+
+  const handleCopyWord = (word: string) => {
+    void copyText(word);
+    setCopiedWord(word);
+    setTimeout(() => setCopiedWord(null), 2000);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Search Container */}
+      <div className="relative isolate">
+        <CardBlobs />
+        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-card space-y-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
+            <Shuffle className="w-6 h-6 text-ink" />
+            {heading}
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Unscramble your letters into valid 5 letter words. Enter five letters, or a longer rack, and use <code className="bg-slate-100 text-slate-800 px-1 py-0.5 rounded font-mono font-bold">?</code> for a blank tile.
+          </p>
+        </div>
+
+        {/* Input Bar */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative grow">
+            <input
+              type="text"
+              aria-label="Your letters (use ? for a blank tile)"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              placeholder="Enter your rack letters (e.g. TEARS, A?LE, OUND)..."
+              value={lettersInput}
+              onChange={(e) => setLettersInput(e.target.value.toUpperCase())}
+              className="w-full px-4 py-3 bg-slate-50 uppercase font-mono font-semibold text-xl tracking-widest text-slate-900 rounded-xl border border-slate-200 focus:bg-white focus:border-brand focus:ring-2 focus:ring-brand/10 outline-hidden transition-all"
+            />
+          </div>
+
+          <button
+            onClick={() => setLettersInput(lettersInput.split('').sort(() => 0.5 - Math.random()).join(''))}
+            className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl border border-slate-200 transition-colors flex items-center justify-center gap-1.5 shrink-0"
+          >
+            <Shuffle className="w-4 h-4 text-ink" />
+            Shuffle Letters
+          </button>
+        </div>
+
+        {/* Presets and options */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-semibold text-slate-400">Try racks:</span>
+            {presets.map((preset) => (
+              <button
+                key={preset}
+                onClick={() => setLettersInput(preset)}
+                className="px-2.5 py-1 text-xs font-mono font-bold bg-slate-100 hover:bg-slate-200 hover:text-ink rounded-lg text-slate-700 transition-colors"
+              >
+                {preset}
+              </button>
+            ))}
+          </div>
+
+          <label className="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={allowSubAnagrams}
+              onChange={(e) => setAllowSubAnagrams(e.target.checked)}
+              className="rounded-sm text-brand focus:ring-brand"
+            />
+            <span>Include partial letter matches (sub-anagrams)</span>
+          </label>
+        </div>
+      </div>
+      </div>
+
+      {/* Results Header */}
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-lg font-semibold text-slate-900">
+          {results.length.toLocaleString()}{' '}
+          <span className="text-slate-500 font-normal">Matching 5-letter anagrams</span>
+        </h2>
+      </div>
+
+      {/* Results Grid */}
+      {results.length === 0 ? (
+        <div className="bg-white rounded-2xl p-10 text-center border border-slate-200">
+          <HelpCircle className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+          <p className="text-base font-bold text-slate-800">No 5-letter anagrams found</p>
+          <p className="text-xs text-slate-500 mt-1">
+            Try adding wildcards like &apos;?&apos; or check for letter typos.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          {results.slice(0, limit).map((wordEntry) => (
+            <div
+              key={wordEntry.word}
+              onClick={() => onSelectWord(wordEntry)}
+              className="bg-white hover:bg-slate-50 p-3 rounded-xl border border-slate-200 hover:border-slate-300 shadow-card hover:shadow-card transition-all flex flex-col justify-between cursor-pointer group"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-base tracking-widest text-slate-900 group-hover:text-ink">
+                  {wordEntry.word}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCopyWord(wordEntry.word);
+                  }}
+                  title="Copy word"
+                  className="p-1 text-slate-300 hover:text-ink rounded transition-colors"
+                >
+                  {copiedWord === wordEntry.word ? (
+                    <Check className="w-3.5 h-3.5 text-ink" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </div>
+
+              <p className="text-[10px] text-slate-500 line-clamp-1 mt-1">
+                {wordEntry.definition}
+              </p>
+
+              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-2 pt-1.5 border-t border-slate-100">
+                <span className="font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">
+                  {wordEntry.scrabbleScore} pts
+                </span>
+                <span className="font-semibold text-slate-500 flex items-center group-hover:text-ink">
+                  View <ChevronRight className="w-2.5 h-2.5 ml-0.5" />
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {results.length > limit && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setLimit((l) => l + PAGE_SIZE)}
+            className="px-5 py-2.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-colors"
+          >
+            Show more ({(results.length - limit).toLocaleString()} left)
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
